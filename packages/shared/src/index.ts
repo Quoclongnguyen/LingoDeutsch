@@ -1,0 +1,31 @@
+export {
+  articles,
+  cefrLevels,
+  createVocabularyInputSchema,
+  governedCases,
+  importCommitInputSchema,
+  importPreviewInputSchema,
+  reviewStates,
+  updateVocabularyInputSchema,
+  updateVocabularySetInputSchema,
+  vocabularyListQuerySchema,
+  vocabularySeedItemSchema,
+  vocabularySetInputSchema,
+  vocabularySetMembershipSchema,
+  wordTypes,
+  type CreateVocabularyInput,
+  type ImportCommitInput,
+  type ImportPreviewInput,
+  type UpdateVocabularyInput,
+  type ValidatedVocabularyInput,
+  type VocabularyListQuery,
+  type VocabularySetInput,
+  type VocabularySeedItem,
+} from "./validation/vocabulary";
+export { normalizeGermanHeadword } from "./vocabulary/normalize-headword";
+export {
+  ImportFormatError,
+  ImportRowLimitError,
+  parseVocabularyImport,
+  type VocabularyImportRow,
+} from "./vocabulary/parse-vocabulary-import";

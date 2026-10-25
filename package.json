@@ -1,0 +1,36 @@
+{
+  "name": "lingo-deutsch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace @lingo-deutsch/web",
+    "dev:api": "npm run dev --workspace @lingo-deutsch/api",
+    "build": "npm run build --workspace @lingo-deutsch/shared && npm run build --workspace @lingo-deutsch/api && npm run build --workspace @lingo-deutsch/web",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspace @lingo-deutsch/shared && npm run typecheck --workspace @lingo-deutsch/api && npm run typecheck --workspace @lingo-deutsch/web",
+    "test": "npm run test --workspace @lingo-deutsch/shared && npm run test --workspace @lingo-deutsch/api && npm run test --workspace @lingo-deutsch/web && vitest run",
+    "test:integration": "npm run test:integration --workspace @lingo-deutsch/api",
+    "test:e2e": "npm run test:e2e --workspace @lingo-deutsch/web",
+    "seed:a1": "npm run seed:a1 --workspace @lingo-deutsch/api"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.3",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

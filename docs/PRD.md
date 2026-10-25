@@ -563,6 +563,8 @@ Tên endpoint chỉ là hợp đồng đề xuất; có thể dùng Route Handle
 
 ### Backend
 
+> Architecture decision (2026-10-25): the approved implementation uses a Fastify API in `apps/api` instead of Next.js Route Handlers for domain data. Auth.js remains in `apps/web` as a framework-bound authentication boundary until an explicit authentication migration is approved. Endpoint contracts, validation, authorization, MongoDB, and SRS requirements below are unchanged.
+
 - Next.js Route Handlers hoặc Server Actions.
 - MongoDB Atlas và Mongoose.
 - Auth.js với MongoDB adapter hoặc một nhà cung cấp đăng nhập tương thích.

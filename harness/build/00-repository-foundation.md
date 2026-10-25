@@ -1,6 +1,6 @@
 # Phase 00 — Repository foundation
 
-Status: In progress
+Status: Complete
 
 ## Source inputs
 
@@ -63,3 +63,7 @@ Create a clean, verifiable foundation for the Lingo Deutsch MVP without implemen
 ## Handoff condition
 
 Phase 00 may be marked complete only after its verification evidence is appended to `harness/build-log.md`. Then Phase 01 may begin.
+
+## Completion
+
+Completed on 2026-10-25. Verification evidence is recorded in `harness/build-log.md`.

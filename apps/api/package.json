@@ -1,0 +1,30 @@
+{
+  "name": "@lingo-deutsch/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "esbuild src/server.ts --bundle --platform=node --format=esm --target=node24 --packages=external --outfile=dist/server.js",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "seed:a1": "tsx scripts/seed-a1.ts"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@lingo-deutsch/shared": "0.1.0",
+    "dotenv": "^18.0.9",
+    "fastify": "^5.6.2",
+    "mongoose": "^9.11.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

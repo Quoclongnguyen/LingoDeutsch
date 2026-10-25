@@ -4,9 +4,10 @@ This file owns the planned phase sequence. Detailed scope and verification for e
 
 | Phase | Name | Status | Outcome |
 |---|---|---|---|
-| 00 | Repository foundation | In progress | Next.js foundation, tooling, MongoDB connection boundary, authentication skeleton, design tokens, and green baseline checks |
-| 01 | Vocabulary data foundation | Not started | Mongoose models, indexes, validation, repositories, services, and seed data |
-| 02 | Vocabulary library | Not started | Searchable/filterable word library, add/edit/archive, sets, and import preview |
+| 00 | Repository foundation | Complete | Next.js foundation, tooling, MongoDB connection boundary, authentication skeleton, design tokens, and green baseline checks |
+| 01 | Vocabulary data foundation | Complete | Mongoose models, indexes, validation, repositories, services, and seed data |
+| 01.5 | Frontend/backend workspace split | Complete | Separate web and API applications in one monorepo while preserving Phase 00/01 behavior |
+| 02 | Vocabulary library | Complete | Searchable/filterable word library, add/edit/archive, sets, and bounded import preview/commit |
 | 03 | SRS vertical slice | Not started | Due queue, review sessions, deterministic scheduling, idempotent rating, and recovery |
 | 04 | Today and A1 learning path | Not started | Data-backed dashboard, minimal A1 path, sample lesson, and save-word flow |
 | 05 | Hardening and preview deployment | Not started | Responsive QA, accessibility, E2E coverage, error states, security review, and preview deployment |
@@ -20,4 +21,4 @@ This file owns the planned phase sequence. Detailed scope and verification for e
 
 ## Current phase
 
-Phase 00 is described in `harness/build/00-repository-foundation.md`.
+Phase 02 is complete. Phase 03 is the next planned phase but has not started.
