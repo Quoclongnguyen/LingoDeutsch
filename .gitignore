@@ -1,0 +1,23 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+dist/
+coverage/
+playwright-report/
+test-results/
+.vercel/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and local tooling
+*.log
+.eslintcache
+.turbo/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
