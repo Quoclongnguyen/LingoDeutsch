@@ -8,6 +8,8 @@ describe("proxyDomainRequest", () => {
     [["learning-path"]],
     [["lessons", "a1-begruessung-und-vorstellung"]],
     [["lesson-progress", "000000000000000000000101"]],
+    [["grammar-topics"]],
+    [["grammar-topics", "a1-personalpronomen"]],
   ])("forwards the Phase 04 domain path %j", async (path) => {
     const fetcher = vi.fn(async () => Response.json({ ok: true }));
     const response = await proxyDomainRequest({

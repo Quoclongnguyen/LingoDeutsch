@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
 import { readDomainJson } from "./read-domain-json";
 import type { LearningPathResponse } from "./types";
+import { LearnSectionNavigation } from "./learn-section-navigation";
 
 export function LearningPathWorkspace() {
   const [path, setPath] = useState<LearningPathResponse>();
@@ -52,6 +53,7 @@ export function LearningPathWorkspace() {
 
   return (
     <div className="page-stack learning-path-page">
+      <LearnSectionNavigation />
       <header className="page-heading learning-heading">
         <div>
           <p className="eyebrow">Lernweg · Lộ trình cá nhân</p>
@@ -160,7 +162,7 @@ export function LearningPathWorkspace() {
                   ) : (
                     <Link
                       className="lesson-link"
-                      href={`/learn/${lesson.slug}`}
+                      href={`/learn/${lesson.slug}${lesson.progress.status === "completed" ? "?replay=1" : ""}`}
                       aria-label={`${lesson.progress.status === "completed" ? "Học lại" : lesson.progress.status === "in_progress" ? "Tiếp tục" : "Mở bài"} ${lesson.titleDe}`}
                     >
                       {lesson.progress.status === "completed"

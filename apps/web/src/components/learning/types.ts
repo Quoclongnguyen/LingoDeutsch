@@ -78,6 +78,11 @@ export type LessonActivity =
 export type LessonResponse = {
   content: { activities: LessonActivity[] };
   estimatedMinutes: number;
+  grammarTopics?: Array<{
+    slug: string;
+    titleDe: string;
+    titleVi: string;
+  }>;
   id: string;
   level: string;
   objectiveVi: string;

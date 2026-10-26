@@ -2,6 +2,32 @@
   align-items: flex-end;
 }
 
+.learn-section-nav {
+  display: flex;
+  width: fit-content;
+  gap: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  padding: 0.25rem;
+}
+
+.learn-section-nav__link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.55rem;
+  color: var(--muted);
+  padding: 0.65rem 0.9rem;
+  font-weight: 750;
+}
+
+.learn-section-nav__link[aria-current="page"] {
+  background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+  color: var(--accent-ink);
+}
+
 .completion-chip,
 .milestone-chip {
   display: inline-flex;
@@ -307,6 +333,45 @@
   color: var(--muted);
 }
 
+.lesson-grammar-links {
+  display: grid;
+  gap: 0.75rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  padding: 1rem 1.25rem;
+}
+
+.lesson-grammar-links > span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lesson-grammar-links > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lesson-grammar-links a {
+  display: grid;
+  min-height: 2.75rem;
+  gap: 0.1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.lesson-grammar-links a:hover {
+  border-color: var(--accent);
+}
+
+.lesson-grammar-links small {
+  color: var(--muted);
+}
+
 .lesson-duration {
   display: inline-flex;
   align-items: center;
@@ -453,6 +518,216 @@
   color: var(--success);
 }
 
+.grammar-library-page,
+.grammar-topic-page {
+  width: min(100%, 64rem);
+  margin: 0 auto;
+}
+
+.grammar-topic-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.grammar-topic-card {
+  overflow: clip;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.grammar-topic-card[open] {
+  border-color: color-mix(in srgb, var(--accent) 65%, var(--line));
+}
+
+.grammar-topic-card summary {
+  display: grid;
+  min-height: 4.75rem;
+  cursor: pointer;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  list-style: none;
+}
+
+.grammar-topic-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.grammar-topic-card summary:hover {
+  background: var(--surface-raised);
+}
+
+.grammar-topic-card summary > span:nth-child(2),
+.grammar-topic-preview blockquote,
+.grammar-examples li,
+.related-lesson-link > span:first-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.grammar-topic-card small,
+.grammar-topic-meta,
+.grammar-examples small,
+.related-lesson-link small {
+  color: var(--muted);
+}
+
+.grammar-topic-order {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--accent-ink);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.grammar-topic-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.grammar-topic-preview {
+  display: grid;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  padding: 1rem 1.25rem 1.25rem 5rem;
+}
+
+.grammar-topic-preview p,
+.grammar-topic-preview blockquote {
+  margin: 0;
+}
+
+.grammar-topic-preview blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 0.85rem;
+}
+
+.grammar-topic-header {
+  display: grid;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1.5rem;
+}
+
+.grammar-topic-header h1,
+.grammar-topic-header p,
+.grammar-rules h2,
+.grammar-rules p,
+.grammar-examples h2,
+.related-lessons h2 {
+  margin: 0;
+}
+
+.grammar-topic-title-vi {
+  color: var(--accent-ink);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.grammar-rules {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.grammar-rules section {
+  border-top: 3px solid var(--accent);
+  border-radius: 0.9rem;
+  background: var(--surface);
+  padding: 1.25rem;
+}
+
+.grammar-label {
+  color: var(--accent-ink);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grammar-examples,
+.related-lessons {
+  display: grid;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+}
+
+.grammar-examples ol,
+.related-lessons ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grammar-examples li {
+  border-left: 2px solid var(--accent);
+  background: var(--surface);
+  padding: 0.85rem 1rem;
+}
+
+.grammar-table-region {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: var(--surface);
+}
+
+.grammar-table-region table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+}
+
+.grammar-table-region caption {
+  padding: 1rem;
+  color: var(--accent-ink);
+  font-weight: 800;
+  text-align: left;
+}
+
+.grammar-table-region th,
+.grammar-table-region td {
+  border-top: 1px solid var(--line);
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.grammar-table-region thead th {
+  background: var(--surface-raised);
+}
+
+.related-lessons li {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--surface);
+}
+
+.related-lesson-link {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+}
+
+.related-lesson-link:hover {
+  border-radius: inherit;
+  background: var(--surface-raised);
+}
+
 @media (min-width: 48rem) {
   .module-heading {
     grid-template-columns: auto minmax(0, 1fr) minmax(14rem, 0.7fr);
@@ -516,5 +791,31 @@
 
   .recent-learning li {
     gap: 0.25rem;
+  }
+
+  .learn-section-nav {
+    width: 100%;
+  }
+
+  .learn-section-nav__link {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .grammar-topic-card summary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .grammar-topic-meta {
+    grid-column: 2;
+  }
+
+  .grammar-topic-preview {
+    padding-left: 1.25rem;
+  }
+
+  .related-lesson-link {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

@@ -63,6 +63,16 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
     },
     estimatedMinutes: 15,
     id: "000000000000000000000101",
+    grammarTopics: [
+      {
+        order: 1,
+        relatedLessonCount: 1,
+        slug: "a1-begruessung-und-anrede",
+        summaryVi: "Chọn lời chào phù hợp.",
+        titleDe: "Begrüßung und Anrede",
+        titleVi: "Chào hỏi và xưng hô",
+      },
+    ],
     level: "A1",
     objectiveVi: "Tự giới thiệu lịch sự.",
     progress: {
@@ -86,6 +96,7 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
       },
     ],
   };
+  let progressPatchCount = 0;
 
   await page.route("**/api/domain/**", async (route) => {
     const request = route.request();
@@ -140,6 +151,7 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
       });
     }
     if (url.pathname.endsWith(`/lesson-progress/${lesson.id}`)) {
+      progressPatchCount += 1;
       lesson.progress = request.postDataJSON();
       return route.fulfill({ json: lesson.progress });
     }
@@ -157,6 +169,9 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
   await expect(
     page.getByRole("heading", { name: "Begrüßung im Sprachkurs" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Begrüßung und Anrede/i }),
+  ).toHaveAttribute("href", "/learn/grammar/a1-begruessung-und-anrede");
   await page.getByRole("button", { name: "Hoàn thành hoạt động" }).click();
   await expect(page.getByText("der Name · die Namen")).toBeVisible();
   await page.getByRole("button", { name: "Lưu vào kho từ" }).click();
@@ -172,6 +187,22 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
     page.getByRole("heading", { name: "Bạn đã hoàn thành bài học" }),
   ).toBeVisible();
 
+  expect(progressPatchCount).toBe(3);
+  await page.getByRole("link", { name: "Luyện lại bài này" }).click();
+  await expect(page).toHaveURL(/replay=1/u);
+  await page.getByRole("button", { name: "Tiếp tục luyện" }).click();
+  await page.getByRole("button", { name: "Tiếp tục luyện" }).click();
+  await page
+    .getByRole("button", {
+      name: /Guten Tag. Ich heiße Long. Wie heißen Sie?/i,
+    })
+    .click();
+  await page.getByRole("button", { name: "Hoàn thành lượt luyện" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Bạn đã luyện lại bài học" }),
+  ).toBeVisible();
+  expect(progressPatchCount).toBe(3);
+
   expect(
     await page.evaluate(
       () =>
@@ -179,5 +210,84 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
         document.documentElement.clientWidth,
     ),
   ).toBe(false);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("learner reads an A1 grammar topic and returns to its lesson", async ({
+  page,
+}) => {
+  await page.route("**/api/domain/grammar-topics**", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname.endsWith("/a1-sein-und-haben")) {
+      return route.fulfill({
+        json: {
+          compactTable: {
+            captionVi: "sein và haben ở thì Präsens",
+            headers: ["Đại từ", "sein", "haben"],
+            rows: [
+              ["ich", "bin", "habe"],
+              ["du", "bist", "hast"],
+            ],
+          },
+          examples: [
+            { de: "Ich bin neu hier.", vi: "Tôi mới đến đây." },
+            { de: "Haben Sie Zeit?", vi: "Ông/bà có thời gian không?" },
+          ],
+          id: "000000000000000000000201",
+          level: "A1",
+          order: 3,
+          relatedLessons: [
+            {
+              slug: "a1-begruessung-und-vorstellung",
+              titleDe: "Begrüßung und Vorstellung",
+              titleVi: "Chào hỏi và giới thiệu",
+            },
+          ],
+          rules: [
+            {
+              explanationVi: "sein thay đổi theo chủ ngữ.",
+              id: "sein-gebrauch",
+              titleDe: "sein",
+            },
+          ],
+          slug: "a1-sein-und-haben",
+          summaryVi: "Hai động từ cơ bản trong câu đơn giản.",
+          titleDe: "sein und haben",
+          titleVi: "Động từ sein và haben",
+        },
+      });
+    }
+    return route.fulfill({
+      json: {
+        level: "A1",
+        topics: [
+          {
+            example: { de: "Ich bin neu hier.", vi: "Tôi mới đến đây." },
+            order: 3,
+            relatedLessonCount: 1,
+            slug: "a1-sein-und-haben",
+            summaryVi: "Hai động từ cơ bản trong câu đơn giản.",
+            titleDe: "sein und haben",
+            titleVi: "Động từ sein và haben",
+          },
+        ],
+      },
+    });
+  });
+
+  await authenticate(page);
+  await page.goto("/learn/grammar");
+  await page.getByText("sein und haben", { exact: true }).click();
+  await page.getByRole("link", { name: /Mở sein und haben/i }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "sein und haben" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("table", { name: "sein và haben ở thì Präsens" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Begrüßung und Vorstellung/i }),
+  ).toHaveAttribute("href", "/learn/a1-begruessung-und-vorstellung");
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });

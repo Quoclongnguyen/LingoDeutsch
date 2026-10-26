@@ -11,12 +11,34 @@ import type { LessonResponse } from "./types";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
 
-export function LessonWorkspace({ slug }: { slug: string }) {
+function activityActionLabel({
+  isLast,
+  pending,
+  replay,
+}: {
+  isLast: boolean;
+  pending: boolean;
+  replay: boolean;
+}) {
+  if (replay) return isLast ? "Hoàn thành lượt luyện" : "Tiếp tục luyện";
+  if (pending) return "Đang lưu…";
+  return isLast ? "Hoàn thành bài học" : "Hoàn thành hoạt động";
+}
+
+export function LessonWorkspace({
+  replay = false,
+  slug,
+}: {
+  replay?: boolean;
+  slug: string;
+}) {
   const [lesson, setLesson] = useState<LessonResponse>();
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [savingHeadword, setSavingHeadword] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [replayIndex, setReplayIndex] = useState(0);
+  const [replayComplete, setReplayComplete] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -53,11 +75,15 @@ export function LessonWorkspace({ slug }: { slug: string }) {
   if (!lesson) return <LoadingSkeleton />;
 
   const activities = lesson.content.activities;
-  const completed = lesson.progress.completedActivityIds;
-  const currentIndex = Math.min(
-    lesson.progress.currentActivityIndex,
-    Math.max(activities.length - 1, 0),
-  );
+  const completed = replay
+    ? activities.slice(0, replayIndex).map((item) => item.id)
+    : lesson.progress.completedActivityIds;
+  const currentIndex = replay
+    ? Math.min(replayIndex, Math.max(activities.length - 1, 0))
+    : Math.min(
+        lesson.progress.currentActivityIndex,
+        Math.max(activities.length - 1, 0),
+      );
   const activity = activities[currentIndex];
   const completedLesson = lesson.progress.status === "completed";
   const checkReady =
@@ -93,6 +119,15 @@ export function LessonWorkspace({ slug }: { slug: string }) {
 
   async function completeActivity() {
     if (!activity || !checkReady) return;
+    if (replay) {
+      if (currentIndex === activities.length - 1) {
+        setReplayComplete(true);
+      } else {
+        setReplayIndex((index) => index + 1);
+        setSelectedAnswer("");
+      }
+      return;
+    }
     setPending(true);
     setError("");
     const completedActivityIds = activities
@@ -124,8 +159,18 @@ export function LessonWorkspace({ slug }: { slug: string }) {
     }
   }
 
-  if (completedLesson) {
-    return <LessonComplete titleDe={lesson.titleDe} />;
+  const replayHref = `/learn/${lesson.slug}?replay=1`;
+  if (replayComplete) {
+    return (
+      <LessonComplete
+        replayed
+        replayHref={replayHref}
+        titleDe={lesson.titleDe}
+      />
+    );
+  }
+  if (completedLesson && !replay) {
+    return <LessonComplete replayHref={replayHref} titleDe={lesson.titleDe} />;
   }
 
   return (
@@ -146,6 +191,20 @@ export function LessonWorkspace({ slug }: { slug: string }) {
         </span>
       </header>
 
+      {lesson.grammarTopics?.length ? (
+        <aside className="lesson-grammar-links" aria-label="Ngữ pháp liên quan">
+          <span>Ngữ pháp liên quan</span>
+          <div>
+            {lesson.grammarTopics.map((topic) => (
+              <Link key={topic.slug} href={`/learn/grammar/${topic.slug}`}>
+                <span lang="de">{topic.titleDe}</span>
+                <small>{topic.titleVi}</small>
+              </Link>
+            ))}
+          </div>
+        </aside>
+      ) : null}
+
       <div
         className="lesson-progress"
         aria-label={`Hoạt động ${currentIndex + 1} trên ${activities.length}`}
@@ -159,7 +218,7 @@ export function LessonWorkspace({ slug }: { slug: string }) {
         </p>
         <div className="lesson-progress__segments" aria-hidden="true">
           {activities.map((item, index) => (
-            <span key={item.id} data-complete={index <= completed.length} />
+            <span key={item.id} data-complete={index < completed.length} />
           ))}
         </div>
       </div>
@@ -193,11 +252,11 @@ export function LessonWorkspace({ slug }: { slug: string }) {
             disabled={pending || !checkReady}
             onClick={() => void completeActivity()}
           >
-            {pending
-              ? "Đang lưu…"
-              : currentIndex === activities.length - 1
-                ? "Hoàn thành bài học"
-                : "Hoàn thành hoạt động"}
+            {activityActionLabel({
+              isLast: currentIndex === activities.length - 1,
+              pending,
+              replay,
+            })}
             <ArrowRight aria-hidden="true" size={18} />
           </button>
         </footer>
