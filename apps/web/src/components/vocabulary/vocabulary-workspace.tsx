@@ -2,6 +2,7 @@
 
 import { AlertTriangle, FileUp, LibraryBig, Plus, Search } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 
 import { ImportDialog } from "@/components/vocabulary/import-dialog";
 import type {
@@ -149,6 +150,11 @@ export function VocabularyWorkspace() {
           </p>
         </div>
         <div className="heading-actions">
+          {data.summary.due > 0 ? (
+            <Link className="button button--primary" href="/practice/review">
+              Ôn {data.summary.due} từ
+            </Link>
+          ) : null}
           <button
             className="button button--secondary"
             type="button"

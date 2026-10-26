@@ -22,6 +22,17 @@ export {
   type VocabularySetInput,
   type VocabularySeedItem,
 } from "./validation/vocabulary";
+export {
+  createReviewSessionInputSchema,
+  rateReviewCardInputSchema,
+  reviewModes,
+  reviewRatings,
+  reviewSessionIdentifierSchema,
+  type CreateReviewSessionInput,
+  type RateReviewCardInput,
+  type ReviewMode,
+  type ReviewRating,
+} from "./validation/review";
 export { normalizeGermanHeadword } from "./vocabulary/normalize-headword";
 export {
   ImportFormatError,
