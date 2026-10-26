@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { cefrLevels } from "./vocabulary";
+import { internalExerciseSchema, publicExerciseSchema } from "./exercise";
 
 const htmlTagPattern = /<\/?[a-z][^>]*>/iu;
 
@@ -59,6 +60,7 @@ export const grammarTopicListQuerySchema = z.object({
 export const grammarTopicContentSchema = z.object({
   compactTable: grammarCompactTableSchema.optional(),
   examples: z.array(grammarExampleSchema).min(2).max(12),
+  exercises: z.array(internalExerciseSchema).max(24).default([]),
   level: z.enum(cefrLevels),
   order: z.number().int().min(1).max(200),
   published: z.boolean(),
@@ -92,13 +94,17 @@ export const grammarRelatedLessonSchema = z.object({
 });
 
 export const grammarTopicDetailSchema = grammarTopicContentSchema
-  .omit({ published: true, relatedLessonSlugs: true })
+  .omit({ exercises: true, published: true, relatedLessonSlugs: true })
   .extend({
+    exercises: z.array(publicExerciseSchema).max(24),
     id: z.string().min(1),
     relatedLessons: z.array(grammarRelatedLessonSchema).max(8),
   });
 
 export type GrammarTopicContent = z.output<typeof grammarTopicContentSchema>;
+export type GrammarTopicContentInput = z.input<
+  typeof grammarTopicContentSchema
+>;
 export type GrammarTopicDetail = z.output<typeof grammarTopicDetailSchema>;
 export type GrammarTopicListQuery = z.output<
   typeof grammarTopicListQuerySchema

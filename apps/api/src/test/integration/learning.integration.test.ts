@@ -89,7 +89,7 @@ describe("learning vertical slice", () => {
         completedActivityIds: [
           "dialogue-introduction",
           "vocabulary-introduction",
-          "check-introduction",
+          "practice-introduction",
         ],
         currentActivityIndex: 3,
         status: "completed",

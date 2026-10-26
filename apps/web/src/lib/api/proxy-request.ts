@@ -5,6 +5,7 @@ type DomainFetcher = (
 
 const allowedRoots = new Set([
   "dashboard",
+  "exercise-attempts",
   "grammar-topics",
   "learning-path",
   "lesson-progress",

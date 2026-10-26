@@ -1,4 +1,7 @@
-import type { GrammarTopicContent } from "@lingo-deutsch/shared";
+import type {
+  GrammarTopicContentInput,
+  InternalExercise,
+} from "@lingo-deutsch/shared";
 
 export const A1_GRAMMAR_TOPICS = [
   {
@@ -217,4 +220,80 @@ export const A1_GRAMMAR_TOPICS = [
     titleDe: "Präsens: regelmäßige Verben",
     titleVi: "Chia động từ ở thì hiện tại",
   },
-] satisfies GrammarTopicContent[];
+] satisfies GrammarTopicContentInput[];
+
+export const A1_GRAMMAR_EXERCISES: Record<string, InternalExercise[]> = {
+  "a1-begruessung-und-anrede": [
+    {
+      correctOptionId: "formal-sie",
+      feedbackCorrectVi:
+        "Đúng: Sie viết hoa dùng cho cách xưng hô trang trọng.",
+      feedbackIncorrectVi: "Trong tình huống trang trọng, dùng Sie viết hoa.",
+      id: "greeting-register",
+      instructionVi: "Chọn đại từ xưng hô phù hợp với nhân viên hành chính.",
+      options: [
+        { id: "informal-du", text: "du" },
+        { id: "formal-sie", text: "Sie" },
+        { id: "plural-ihr", text: "ihr" },
+      ],
+      promptDe: "Wie heißen ___?",
+      type: "multiple_choice",
+    },
+  ],
+  "a1-personalpronomen": [
+    {
+      acceptedAnswers: ["wir"],
+      caseSensitive: false,
+      feedbackCorrectVi: "Đúng: wir là đại từ ngôi thứ nhất số nhiều.",
+      feedbackIncorrectVi: "Khi nói “chúng tôi/chúng ta”, dùng wir.",
+      id: "pronoun-wir",
+      instructionVi: "Điền đại từ nhân xưng còn thiếu.",
+      promptDe: "Anna und ich lernen Deutsch. ___ lernen zusammen.",
+      type: "fill_blank",
+    },
+  ],
+  "a1-sein-und-haben": [
+    {
+      correctOrder: ["ich", "habe", "einen", "termin"],
+      feedbackCorrectVi: "Đúng: với ich, haben được chia thành habe.",
+      feedbackIncorrectVi: "Dùng cấu trúc Ich habe einen Termin.",
+      id: "haben-termin",
+      instructionVi: "Sắp xếp thành câu đúng.",
+      tokens: [
+        { id: "termin", text: "Termin." },
+        { id: "ich", text: "Ich" },
+        { id: "einen", text: "einen" },
+        { id: "habe", text: "habe" },
+      ],
+      type: "word_ordering",
+    },
+  ],
+  "a1-artikel-der-die-das": [
+    {
+      correctOptionId: "der-termin",
+      feedbackCorrectVi: "Đúng: Termin là danh từ giống đực: der Termin.",
+      feedbackIncorrectVi: "Học danh từ cùng mạo từ: der Termin.",
+      id: "article-termin",
+      instructionVi: "Chọn mạo từ đúng.",
+      options: [
+        { id: "der-termin", text: "der Termin" },
+        { id: "die-termin", text: "die Termin" },
+        { id: "das-termin", text: "das Termin" },
+      ],
+      promptDe: "Welcher Artikel gehört zu Termin?",
+      type: "multiple_choice",
+    },
+  ],
+  "a1-praesens": [
+    {
+      acceptedAnswers: ["arbeitet"],
+      caseSensitive: false,
+      feedbackCorrectVi: "Đúng: với er, arbeiten được chia thành arbeitet.",
+      feedbackIncorrectVi: "Thân từ kết thúc bằng -t nên thêm -et: arbeitet.",
+      id: "praesens-arbeiten",
+      instructionVi: "Điền dạng Präsens đúng.",
+      promptDe: "Er ___ in einem Hotel.",
+      type: "fill_blank",
+    },
+  ],
+};

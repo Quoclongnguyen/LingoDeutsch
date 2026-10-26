@@ -177,6 +177,79 @@ describe("Phase 04 learning workspaces", () => {
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
+  it("unlocks lesson progress only after the server grades its exercise set", async () => {
+    const exerciseLesson = {
+      ...lessonRecord,
+      content: {
+        activities: [
+          {
+            exercises: [
+              {
+                feedbackCorrectVi: "Đúng: Sie là cách xưng hô trang trọng.",
+                feedbackIncorrectVi: "Hãy dùng Sie.",
+                id: "formal-address",
+                instructionVi: "Chọn đại từ phù hợp.",
+                options: [
+                  { id: "du", text: "du" },
+                  { id: "sie", text: "Sie" },
+                ],
+                promptDe: "Wie heißen ___?",
+                type: "multiple_choice",
+              },
+            ],
+            id: "practice-introduction",
+            instructionVi: "Luyện cách xưng hô.",
+            type: "exercise_set",
+          },
+        ],
+      },
+    };
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json(exerciseLesson))
+      .mockResolvedValueOnce(
+        Response.json({
+          attempt: { score: 1, total: 1 },
+          idempotent: false,
+          results: [
+            {
+              correct: true,
+              exerciseId: "formal-address",
+              feedbackVi: "Đúng: Sie là cách xưng hô trang trọng.",
+              type: "multiple_choice",
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          completedActivityIds: ["practice-introduction"],
+          currentActivityIndex: 1,
+          status: "completed",
+        }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<LessonWorkspace slug={exerciseLesson.slug} />);
+    const complete = await screen.findByRole("button", {
+      name: "Hoàn thành bài học",
+    });
+    expect(complete).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Sie" }));
+    await user.click(screen.getByRole("button", { name: "Nộp bài" }));
+    expect(
+      await screen.findByRole("heading", { name: "Kết quả 1/1" }),
+    ).toBeInTheDocument();
+    expect(complete).toBeEnabled();
+    await user.click(complete);
+
+    await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(3));
+    expect(fetcher.mock.calls[2]?.[0]).toBe(
+      "/api/domain/lesson-progress/000000000000000000000101",
+    );
+  });
+
   it("renders the real Today due action and next lesson", async () => {
     vi.stubGlobal(
       "fetch",

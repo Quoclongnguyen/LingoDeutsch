@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { cefrLevels } from "./vocabulary";
+import { internalExerciseSchema, publicExerciseSchema } from "./exercise";
 
 export const learningPathQuerySchema = z.object({
   level: z.enum(cefrLevels).default("A1"),
@@ -32,21 +33,21 @@ export const lessonActivitySchema = z.discriminatedUnion("type", [
     type: z.literal("vocabulary"),
   }),
   z.object({
-    correctOptionId: activityIdSchema,
-    feedbackVi: z.string().trim().min(1).max(500),
+    exercises: z.array(internalExerciseSchema).min(1).max(12),
     id: activityIdSchema,
     instructionVi: z.string().trim().min(1).max(320),
-    options: z
-      .array(
-        z.object({
-          id: activityIdSchema,
-          text: z.string().trim().min(1).max(320),
-        }),
-      )
-      .min(2)
-      .max(6),
-    questionDe: z.string().trim().min(1).max(320),
-    type: z.literal("check"),
+    type: z.literal("exercise_set"),
+  }),
+]);
+
+export const publicLessonActivitySchema = z.discriminatedUnion("type", [
+  lessonActivitySchema.options[0],
+  lessonActivitySchema.options[1],
+  z.object({
+    exercises: z.array(publicExerciseSchema).min(1).max(12),
+    id: activityIdSchema,
+    instructionVi: z.string().trim().min(1).max(320),
+    type: z.literal("exercise_set"),
   }),
 ]);
 
@@ -72,6 +73,7 @@ export const lessonVocabularySaveInputSchema = z.object({
 
 export type LearningPathQuery = z.output<typeof learningPathQuerySchema>;
 export type LessonActivity = z.output<typeof lessonActivitySchema>;
+export type PublicLessonActivity = z.output<typeof publicLessonActivitySchema>;
 export type LessonContent = z.output<typeof lessonContentSchema>;
 export type LessonProgressInput = z.output<typeof lessonProgressInputSchema>;
 export type LessonVocabularySaveInput = z.output<

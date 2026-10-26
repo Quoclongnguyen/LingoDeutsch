@@ -15,6 +15,10 @@ export function findPublishedGrammarTopicBySlug(slug: string) {
   return GrammarTopicModel.findOne({ published: true, slug }).lean().exec();
 }
 
+export function findPublishedGrammarTopicById(id: string) {
+  return GrammarTopicModel.findOne({ _id: id, published: true }).lean().exec();
+}
+
 export function queryPublishedLessonsBySlugs(slugs: string[]) {
   return LessonModel.find({ published: true, slug: { $in: slugs } })
     .select({ _id: 0, slug: 1, titleDe: 1, titleVi: 1 })

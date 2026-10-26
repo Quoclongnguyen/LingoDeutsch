@@ -1,31 +1,10 @@
 import {
   vocabularySeedItemSchema,
+  type LessonActivity as SharedLessonActivity,
   type VocabularySeedItem,
 } from "@lingo-deutsch/shared";
 
-export type LessonActivity =
-  | {
-      id: string;
-      instructionVi: string;
-      lines: Array<{ de: string; speaker: string; vi: string }>;
-      titleDe: string;
-      type: "dialogue";
-    }
-  | {
-      headwords: string[];
-      id: string;
-      instructionVi: string;
-      type: "vocabulary";
-    }
-  | {
-      correctOptionId: string;
-      feedbackVi: string;
-      id: string;
-      instructionVi: string;
-      options: Array<{ id: string; text: string }>;
-      questionDe: string;
-      type: "check";
-    };
+export type LessonActivity = SharedLessonActivity;
 
 export type LessonSeed = {
   content: { activities: LessonActivity[] };
@@ -81,21 +60,31 @@ export const A1_LESSONS: LessonSeed[] = [
           type: "vocabulary",
         },
         {
-          correctOptionId: "formal-introduction",
-          feedbackVi:
-            "Trong tình huống trang trọng, dùng Ich heiße… và hỏi lại bằng Wie heißen Sie?",
-          id: "check-introduction",
-          instructionVi: "Chọn câu giới thiệu phù hợp trong lần gặp đầu tiên.",
-          options: [
+          exercises: [
             {
+              correctOptionId: "formal-introduction",
+              feedbackCorrectVi:
+                "Đúng: Guten Tag và Sie phù hợp với lần gặp trang trọng.",
+              feedbackIncorrectVi:
+                "Trong lần gặp trang trọng, hãy dùng Guten Tag và đại từ Sie.",
               id: "formal-introduction",
-              text: "Guten Tag. Ich heiße Long. Wie heißen Sie?",
+              instructionVi:
+                "Chọn câu giới thiệu phù hợp trong lần gặp đầu tiên.",
+              options: [
+                {
+                  id: "formal-introduction",
+                  text: "Guten Tag. Ich heiße Long. Wie heißen Sie?",
+                },
+                { id: "informal-command", text: "Hallo! Sag deinen Namen!" },
+                { id: "farewell", text: "Auf Wiedersehen. Bis morgen." },
+              ],
+              promptDe: "Wie stellen Sie sich höflich vor?",
+              type: "multiple_choice",
             },
-            { id: "informal-command", text: "Hallo! Sag deinen Namen!" },
-            { id: "farewell", text: "Auf Wiedersehen. Bis morgen." },
           ],
-          questionDe: "Wie stellen Sie sich höflich vor?",
-          type: "check",
+          id: "practice-introduction",
+          instructionVi: "Áp dụng cách xưng hô trang trọng.",
+          type: "exercise_set",
         },
       ],
     },
@@ -213,7 +202,80 @@ export const A1_LESSONS: LessonSeed[] = [
     ],
   },
   {
-    content: { activities: [] },
+    content: {
+      activities: [
+        {
+          id: "dialogue-appointment",
+          instructionVi: "Đọc cách đề nghị và xác nhận một giờ hẹn.",
+          lines: [
+            {
+              de: "Passt Ihnen Montag um zehn Uhr?",
+              speaker: "Anna",
+              vi: "Thứ Hai lúc mười giờ có phù hợp với ông/bà không?",
+            },
+            {
+              de: "Ja, der Termin passt mir gut.",
+              speaker: "Long",
+              vi: "Vâng, giờ hẹn đó phù hợp với tôi.",
+            },
+          ],
+          titleDe: "Einen Termin vereinbaren",
+          type: "dialogue",
+        },
+        {
+          headwords: ["Termin", "Uhrzeit", "vereinbaren", "pünktlich"],
+          id: "vocabulary-appointment",
+          instructionVi: "Lưu các từ cần thiết để đặt lịch và đến đúng giờ.",
+          type: "vocabulary",
+        },
+        {
+          exercises: [
+            {
+              correctOptionId: "um-zehn",
+              feedbackCorrectVi: "Đúng: um đi trước giờ cụ thể.",
+              feedbackIncorrectVi: "Với giờ cụ thể, tiếng Đức dùng giới từ um.",
+              id: "appointment-preposition",
+              instructionVi: "Chọn cụm thời gian đúng.",
+              options: [
+                { id: "um-zehn", text: "um zehn Uhr" },
+                { id: "am-zehn", text: "am zehn Uhr" },
+                { id: "im-zehn", text: "im zehn Uhr" },
+              ],
+              promptDe: "Der Termin ist ___?",
+              type: "multiple_choice",
+            },
+            {
+              acceptedAnswers: ["pünktlich"],
+              caseSensitive: false,
+              feedbackCorrectVi: "Đúng: pünktlich nghĩa là đúng giờ.",
+              feedbackIncorrectVi: "Giữ nguyên umlaut trong từ pünktlich.",
+              id: "appointment-punctual",
+              instructionVi: "Điền tính từ phù hợp.",
+              promptDe: "Ich bin immer ___.",
+              type: "fill_blank",
+            },
+            {
+              correctOrder: ["wir", "vereinbaren", "einen", "termin"],
+              feedbackCorrectVi: "Đúng: động từ đứng ở vị trí thứ hai.",
+              feedbackIncorrectVi:
+                "Trong câu trần thuật, vereinbaren đứng sau chủ ngữ.",
+              id: "appointment-order",
+              instructionVi: "Sắp xếp thành một câu hoàn chỉnh.",
+              tokens: [
+                { id: "einen", text: "einen" },
+                { id: "termin", text: "Termin." },
+                { id: "wir", text: "Wir" },
+                { id: "vereinbaren", text: "vereinbaren" },
+              ],
+              type: "word_ordering",
+            },
+          ],
+          id: "practice-appointment",
+          instructionVi: "Luyện đặt lịch bằng ba dạng bài ngắn.",
+          type: "exercise_set",
+        },
+      ],
+    },
     estimatedMinutes: 18,
     lessonOrder: 2,
     level: "A1",
@@ -338,7 +400,85 @@ export const A1_LESSONS: LessonSeed[] = [
     ],
   },
   {
-    content: { activities: [] },
+    content: {
+      activities: [
+        {
+          id: "dialogue-supermarket",
+          instructionVi: "Đọc đoạn hội thoại ngắn tại quầy thanh toán.",
+          lines: [
+            {
+              de: "Wie viel kostet das Brot?",
+              speaker: "Long",
+              vi: "Ổ bánh mì này giá bao nhiêu?",
+            },
+            {
+              de: "Das Brot kostet zwei Euro.",
+              speaker: "Verkäuferin",
+              vi: "Ổ bánh mì giá hai euro.",
+            },
+          ],
+          titleDe: "An der Kasse",
+          type: "dialogue",
+        },
+        {
+          headwords: ["Lebensmittel", "Preis", "kaufen", "bezahlen"],
+          id: "vocabulary-supermarket",
+          instructionVi: "Lưu các từ cần dùng khi mua sắm.",
+          type: "vocabulary",
+        },
+        {
+          exercises: [
+            {
+              correctOptionId: "mit-karte",
+              feedbackCorrectVi:
+                "Đúng: mit Karte bezahlen là thanh toán bằng thẻ.",
+              feedbackIncorrectVi:
+                "Để hỏi cách thanh toán, dùng mit Karte bezahlen.",
+              id: "supermarket-payment",
+              instructionVi: "Chọn câu hỏi phù hợp tại quầy thanh toán.",
+              options: [
+                { id: "mit-karte", text: "Kann ich mit Karte bezahlen?" },
+                { id: "appointment", text: "Passt Ihnen Montag?" },
+                { id: "introduction", text: "Wie heißen Sie?" },
+              ],
+              promptDe: "Sie möchten mit Karte bezahlen.",
+              type: "multiple_choice",
+            },
+            {
+              acceptedAnswers: ["kostet"],
+              caseSensitive: false,
+              feedbackCorrectVi: "Đúng: das đi với kostet.",
+              feedbackIncorrectVi:
+                "Với chủ ngữ das, kosten được chia thành kostet.",
+              id: "supermarket-cost",
+              instructionVi: "Điền dạng động từ đúng.",
+              promptDe: "Wie viel ___ das?",
+              type: "fill_blank",
+            },
+            {
+              correctOrder: ["ich", "haette", "gern", "ein", "brot"],
+              feedbackCorrectVi:
+                "Đúng: Ich hätte gern… là cách yêu cầu lịch sự.",
+              feedbackIncorrectVi:
+                "Bắt đầu bằng Ich hätte gern, sau đó là món cần mua.",
+              id: "supermarket-order",
+              instructionVi: "Sắp xếp thành một yêu cầu lịch sự.",
+              tokens: [
+                { id: "brot", text: "Brot." },
+                { id: "gern", text: "gern" },
+                { id: "ich", text: "Ich" },
+                { id: "ein", text: "ein" },
+                { id: "haette", text: "hätte" },
+              ],
+              type: "word_ordering",
+            },
+          ],
+          id: "practice-supermarket",
+          instructionVi: "Luyện hỏi giá và thanh toán.",
+          type: "exercise_set",
+        },
+      ],
+    },
     estimatedMinutes: 18,
     lessonOrder: 1,
     level: "A1",
@@ -456,7 +596,85 @@ export const A1_LESSONS: LessonSeed[] = [
     ],
   },
   {
-    content: { activities: [] },
+    content: {
+      activities: [
+        {
+          id: "dialogue-occupation",
+          instructionVi: "Đọc cách nói ngắn gọn về nghề nghiệp và mục tiêu.",
+          lines: [
+            {
+              de: "Was sind Sie von Beruf?",
+              speaker: "Frau Keller",
+              vi: "Ông/bà làm nghề gì?",
+            },
+            {
+              de: "Ich arbeite im Verkauf und bewerbe mich um eine Ausbildungsstelle.",
+              speaker: "Long",
+              vi: "Tôi làm trong ngành bán hàng và ứng tuyển một vị trí học nghề.",
+            },
+          ],
+          titleDe: "Über den Beruf sprechen",
+          type: "dialogue",
+        },
+        {
+          headwords: ["sich bewerben", "Bewerbung", "Beruf", "Ausbildung"],
+          id: "vocabulary-occupation",
+          instructionVi: "Lưu các từ nền tảng về nghề nghiệp và ứng tuyển.",
+          type: "vocabulary",
+        },
+        {
+          exercises: [
+            {
+              correctOptionId: "um-stelle",
+              feedbackCorrectVi: "Đúng: sich bewerben um đi với Akkusativ.",
+              feedbackIncorrectVi:
+                "Động từ sich bewerben dùng giới từ um + Akkusativ.",
+              id: "occupation-preposition",
+              instructionVi: "Chọn cụm đúng.",
+              options: [
+                { id: "um-stelle", text: "um eine Stelle" },
+                { id: "mit-stelle", text: "mit eine Stelle" },
+                { id: "bei-stelle", text: "bei eine Stelle" },
+              ],
+              promptDe: "Ich bewerbe mich ___?",
+              type: "multiple_choice",
+            },
+            {
+              acceptedAnswers: ["arbeite"],
+              caseSensitive: false,
+              feedbackCorrectVi:
+                "Đúng: với ich, arbeiten được chia thành arbeite.",
+              feedbackIncorrectVi: "Với chủ ngữ ich, thêm đuôi -e: arbeite.",
+              id: "occupation-verb",
+              instructionVi: "Điền dạng động từ đúng.",
+              promptDe: "Ich ___ in einem Hotel.",
+              type: "fill_blank",
+            },
+            {
+              correctOrder: ["ich", "bewerbe", "mich", "um", "eine", "stelle"],
+              feedbackCorrectVi:
+                "Đúng: đại từ phản thân mich đứng sau động từ.",
+              feedbackIncorrectVi:
+                "Dùng cấu trúc Ich bewerbe mich um eine Stelle.",
+              id: "occupation-order",
+              instructionVi: "Sắp xếp câu ứng tuyển.",
+              tokens: [
+                { id: "stelle", text: "Stelle." },
+                { id: "mich", text: "mich" },
+                { id: "ich", text: "Ich" },
+                { id: "eine", text: "eine" },
+                { id: "um", text: "um" },
+                { id: "bewerbe", text: "bewerbe" },
+              ],
+              type: "word_ordering",
+            },
+          ],
+          id: "practice-occupation",
+          instructionVi: "Luyện nói về công việc và ứng tuyển.",
+          type: "exercise_set",
+        },
+      ],
+    },
     estimatedMinutes: 20,
     lessonOrder: 2,
     level: "A1",

@@ -63,6 +63,20 @@ describe("Phase 05 grammar workspaces", () => {
             { de: "Ich bin Long.", vi: "Tôi là Long." },
             { de: "Sie sind Frau Keller.", vi: "Bà là cô Keller." },
           ],
+          exercises: [
+            {
+              feedbackCorrectVi: "Đúng.",
+              feedbackIncorrectVi: "Hãy xem lại cách chia sein.",
+              id: "sein-form",
+              instructionVi: "Chọn dạng đúng.",
+              options: [
+                { id: "bin", text: "bin" },
+                { id: "bist", text: "bist" },
+              ],
+              promptDe: "Ich ___ Long.",
+              type: "multiple_choice",
+            },
+          ],
           id: "topic-1",
           level: "A1",
           order: 3,
@@ -102,5 +116,11 @@ describe("Phase 05 grammar workspaces", () => {
     expect(
       screen.getByRole("link", { name: /Begrüßung und Vorstellung/i }),
     ).toHaveAttribute("href", "/learn/a1-begruessung-und-vorstellung");
+    expect(
+      screen.getByRole("link", { name: /Bắt đầu luyện/i }),
+    ).toHaveAttribute(
+      "href",
+      "/practice/exercises/grammar_topic/a1-sein-und-haben",
+    );
   });
 });

@@ -50,7 +50,7 @@ describe("grammar library persistence", () => {
       .lean();
     expect(topics).toHaveLength(5);
     expect(topics.map((topic) => topic.order)).toEqual([1, 2, 3, 4, 5]);
-    expect(topics.every((topic) => topic.exercises.length === 0)).toBe(true);
+    expect(topics.every((topic) => topic.exercises.length >= 1)).toBe(true);
   });
 
   it("returns only published topics and resolves published related lessons", async () => {

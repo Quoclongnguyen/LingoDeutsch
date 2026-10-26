@@ -36,7 +36,7 @@ export function LessonWorkspace({
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const [savingHeadword, setSavingHeadword] = useState("");
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const [exerciseComplete, setExerciseComplete] = useState(false);
   const [replayIndex, setReplayIndex] = useState(0);
   const [replayComplete, setReplayComplete] = useState(false);
 
@@ -86,8 +86,7 @@ export function LessonWorkspace({
       );
   const activity = activities[currentIndex];
   const completedLesson = lesson.progress.status === "completed";
-  const checkReady =
-    activity?.type !== "check" || selectedAnswer === activity.correctOptionId;
+  const activityReady = activity?.type !== "exercise_set" || exerciseComplete;
 
   async function saveWord(headword: string) {
     setSavingHeadword(headword);
@@ -118,13 +117,13 @@ export function LessonWorkspace({
   }
 
   async function completeActivity() {
-    if (!activity || !checkReady) return;
+    if (!activity || !activityReady) return;
     if (replay) {
       if (currentIndex === activities.length - 1) {
         setReplayComplete(true);
       } else {
         setReplayIndex((index) => index + 1);
-        setSelectedAnswer("");
+        setExerciseComplete(false);
       }
       return;
     }
@@ -149,7 +148,7 @@ export function LessonWorkspace({
         }),
       );
       setLesson((current) => (current ? { ...current, progress } : current));
-      setSelectedAnswer("");
+      setExerciseComplete(false);
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : "Không thể lưu tiến độ.",
@@ -226,10 +225,10 @@ export function LessonWorkspace({
       {activity ? (
         <LessonActivityView
           activity={activity}
+          lessonId={lesson.id}
+          onExerciseCompletionChange={setExerciseComplete}
           onSaveWord={saveWord}
-          onSelectAnswer={setSelectedAnswer}
           savingHeadword={savingHeadword}
-          selectedAnswer={selectedAnswer}
           vocabulary={lesson.vocabulary}
         />
       ) : (
@@ -249,7 +248,7 @@ export function LessonWorkspace({
           <button
             className="button button--primary"
             type="button"
-            disabled={pending || !checkReady}
+            disabled={pending || !activityReady}
             onClick={() => void completeActivity()}
           >
             {activityActionLabel({

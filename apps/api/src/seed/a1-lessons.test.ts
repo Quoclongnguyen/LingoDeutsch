@@ -68,8 +68,8 @@ describe("A1 lesson seed", () => {
     expect(activityIds).toEqual([
       "dialogue-introduction",
       "vocabulary-introduction",
-      "check-introduction",
+      "practice-introduction",
     ]);
-    expect(sample?.content.activities.at(-1)?.type).toBe("check");
+    expect(sample?.content.activities.at(-1)?.type).toBe("exercise_set");
   });
 });

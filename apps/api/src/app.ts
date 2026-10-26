@@ -40,10 +40,21 @@ import {
   LessonVocabularyNotFoundError,
 } from "@/services/learning/learning";
 import { GrammarTopicNotFoundError } from "@/services/grammar/grammar";
+import {
+  defaultExerciseAttemptServices,
+  registerExerciseAttemptRoutes,
+  type ExerciseAttemptRouteServices,
+} from "@/routes/exercise-attempts";
+import {
+  ExerciseAttemptConflictError,
+  ExerciseSourceNotFoundError,
+  InvalidExerciseAnswersError,
+} from "@/services/exercise/exercise-attempts";
 
 export async function buildApi({
   logger = true,
   internalApiSecret,
+  exerciseAttemptServices,
   grammarServices,
   learningServices,
   reviewServices,
@@ -51,6 +62,7 @@ export async function buildApi({
   webOrigin,
 }: {
   internalApiSecret: string;
+  exerciseAttemptServices?: Partial<ExerciseAttemptRouteServices>;
   grammarServices?: Partial<GrammarRouteServices>;
   learningServices?: Partial<LearningRouteServices>;
   logger?: FastifyServerOptions["logger"];
@@ -108,7 +120,8 @@ export async function buildApi({
       error instanceof ReviewSessionNotFoundError ||
       error instanceof LessonNotFoundError ||
       error instanceof LessonVocabularyNotFoundError ||
-      error instanceof GrammarTopicNotFoundError
+      error instanceof GrammarTopicNotFoundError ||
+      error instanceof ExerciseSourceNotFoundError
     ) {
       return reply.code(404).send({ error: "not_found" });
     }
@@ -118,6 +131,12 @@ export async function buildApi({
       error instanceof LessonProgressConflictError
     ) {
       return reply.code(409).send({ error: "review_conflict" });
+    }
+    if (error instanceof ExerciseAttemptConflictError) {
+      return reply.code(409).send({ error: "exercise_attempt_conflict" });
+    }
+    if (error instanceof InvalidExerciseAnswersError) {
+      return reply.code(400).send({ error: "invalid_exercise_answers" });
     }
 
     request.log.error(error);
@@ -139,6 +158,13 @@ export async function buildApi({
   await registerGrammarRoutes(api, {
     internalApiSecret,
     services: { ...defaultGrammarServices, ...grammarServices },
+  });
+  await registerExerciseAttemptRoutes(api, {
+    internalApiSecret,
+    services: {
+      ...defaultExerciseAttemptServices,
+      ...exerciseAttemptServices,
+    },
   });
 
   return api;

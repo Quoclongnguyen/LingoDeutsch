@@ -50,6 +50,7 @@ export function GrammarTopicWorkspace({ slug }: { slug: string }) {
     );
   }
   if (!topic) return <LoadingSkeleton />;
+  const exercises = topic.exercises ?? [];
 
   return (
     <article className="page-stack grammar-topic-page">
@@ -125,6 +126,27 @@ export function GrammarTopicWorkspace({ slug }: { slug: string }) {
             </tbody>
           </table>
         </div>
+      ) : null}
+
+      {exercises.length > 0 ? (
+        <section
+          className="grammar-practice-callout"
+          aria-labelledby="practice-title"
+        >
+          <div>
+            <p className="eyebrow">Übungen</p>
+            <h2 id="practice-title">Luyện chủ đề này</h2>
+            <p>
+              Hoàn thành {exercises.length} câu và nhận phản hồi sau khi nộp.
+            </p>
+          </div>
+          <Link
+            className="button button--primary"
+            href={`/practice/exercises/grammar_topic/${topic.slug}`}
+          >
+            Bắt đầu luyện <ArrowRight aria-hidden="true" size={17} />
+          </Link>
+        </section>
       ) : null}
 
       <section className="related-lessons" aria-labelledby="lessons-title">

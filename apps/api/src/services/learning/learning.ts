@@ -6,6 +6,7 @@ import {
   lessonProgressInputSchema,
   normalizeGermanHeadword,
   vocabularySeedItemSchema,
+  toPublicExercise,
   type LessonProgressInput,
 } from "@lingo-deutsch/shared";
 import { connectToDatabase } from "@/lib/db/mongoose";
@@ -114,6 +115,16 @@ export async function getLesson({
   const lesson = await findPublishedLessonBySlug(slug);
   if (!lesson) throw new LessonNotFoundError();
   const content = lessonContentSchema.parse(lesson.content);
+  const publicContent = {
+    activities: content.activities.map((activity) =>
+      activity.type === "exercise_set"
+        ? {
+            ...activity,
+            exercises: activity.exercises.map(toPublicExercise),
+          }
+        : activity,
+    ),
+  };
   const [progress, savedHeadwords, grammarTopics] = await Promise.all([
     findLessonProgressForUser(userId, lesson._id.toString()),
     findSavedHeadwordsForLesson(userId, lesson._id.toString()),
@@ -128,7 +139,7 @@ export async function getLesson({
   });
 
   return {
-    content,
+    content: publicContent,
     estimatedMinutes: lesson.estimatedMinutes,
     id: lesson._id.toString(),
     grammarTopics,
