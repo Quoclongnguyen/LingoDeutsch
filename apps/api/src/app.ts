@@ -10,19 +10,31 @@ import {
   registerVocabularyRoutes,
   type VocabularyRouteServices,
 } from "@/routes/vocabulary";
+import {
+  defaultReviewServices,
+  registerReviewRoutes,
+  type ReviewRouteServices,
+} from "@/routes/reviews";
 import { DuplicateVocabularyWordError } from "@/services/vocabulary/create-vocabulary-word";
 import { VocabularyWordNotFoundError } from "@/services/vocabulary/vocabulary-library";
 import { VocabularySetNotFoundError } from "@/services/vocabulary/vocabulary-sets";
 import { VocabularySetOwnershipError } from "@/services/vocabulary/assert-owned-sets";
+import {
+  ReviewEventConflictError,
+  ReviewSessionNotFoundError,
+  ReviewSessionStateError,
+} from "@/services/review/review-sessions";
 
 export async function buildApi({
   logger = true,
   internalApiSecret,
+  reviewServices,
   vocabularyServices,
   webOrigin,
 }: {
   internalApiSecret: string;
   logger?: FastifyServerOptions["logger"];
+  reviewServices?: Partial<ReviewRouteServices>;
   vocabularyServices?: Partial<VocabularyRouteServices>;
   webOrigin: string;
 }) {
@@ -72,9 +84,16 @@ export async function buildApi({
     if (
       error instanceof VocabularyWordNotFoundError ||
       error instanceof VocabularySetNotFoundError ||
-      error instanceof VocabularySetOwnershipError
+      error instanceof VocabularySetOwnershipError ||
+      error instanceof ReviewSessionNotFoundError
     ) {
       return reply.code(404).send({ error: "not_found" });
+    }
+    if (
+      error instanceof ReviewSessionStateError ||
+      error instanceof ReviewEventConflictError
+    ) {
+      return reply.code(409).send({ error: "review_conflict" });
     }
 
     request.log.error(error);
@@ -84,6 +103,10 @@ export async function buildApi({
   await registerVocabularyRoutes(api, {
     internalApiSecret,
     services: { ...defaultVocabularyServices, ...vocabularyServices },
+  });
+  await registerReviewRoutes(api, {
+    internalApiSecret,
+    services: { ...defaultReviewServices, ...reviewServices },
   });
 
   return api;

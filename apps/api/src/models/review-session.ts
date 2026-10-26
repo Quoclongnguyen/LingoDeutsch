@@ -30,6 +30,13 @@ const reviewSessionSchema = new Schema(
 );
 
 reviewSessionSchema.index({ userId: 1, status: 1, updatedAt: -1 });
+reviewSessionSchema.index(
+  { userId: 1, mode: 1 },
+  {
+    partialFilterExpression: { status: "active" },
+    unique: true,
+  },
+);
 
 export type ReviewSession = InferSchemaType<typeof reviewSessionSchema>;
 

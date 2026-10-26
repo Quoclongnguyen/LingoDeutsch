@@ -3,7 +3,12 @@ type DomainFetcher = (
   init?: RequestInit,
 ) => Promise<Response>;
 
-const allowedRoots = new Set(["vocabulary", "vocabulary-sets"]);
+const allowedRoots = new Set([
+  "review-sessions",
+  "reviews",
+  "vocabulary",
+  "vocabulary-sets",
+]);
 
 function isAllowedPath(path: string[]) {
   return path.length > 0 && allowedRoots.has(path[0] ?? "");

@@ -10,7 +10,7 @@ This file records observed implementation progress and verification evidence. Pl
 | 01 — Vocabulary data foundation | Complete | Validated schemas and indexes, tenant-safe repositories, atomic word/review-state creation, isolated Atlas integration tests, and verified A1 seed |
 | 01.5 — Frontend/backend workspace split | Complete | Web, API, and shared workspaces verified locally and against the isolated Atlas test database; production seed counts preserved |
 | 02 — Vocabulary library | Complete | Authenticated BFF, user-scoped vocabulary API, responsive CRUD/search/sets/import UI, and all Phase 02 checks passed |
-| 03 — SRS vertical slice | Not started | — |
+| 03 — SRS vertical slice | Complete | Deterministic scheduler, tenant-safe due queue, transactional/idempotent rating, recoverable session UI, and all finish gates verified |
 | 04 — Today and A1 learning path | Not started | — |
 | 05 — Hardening and preview deployment | Not started | — |
 
@@ -185,3 +185,30 @@ Observed verification:
 | `npm run test:e2e` | Passed: 8 tests across desktop Chromium and Pixel 7 emulation; no horizontal overflow and zero axe violations in the vocabulary flow |
 
 Phase 02 acceptance criteria are fully satisfied. Phase 03 remains not started.
+
+### 2026-10-26 — Phase 03 SRS vertical slice complete
+
+Implemented:
+
+- Added validated review-session and rating contracts without accepting a client-controlled owner ID.
+- Added a deterministic simplified SM-2 scheduler for all `again`, `hard`, `good`, and `easy` branches, ease clamping, lapses, mastery, and server-time interval previews.
+- Added a user-scoped due queue with oldest-due ordering, a 50-card session cap, and a 10-new-card UTC-day cap.
+- Added recoverable review sessions, explicit restart, immutable review logs, transactional state/session/log updates, and idempotent `reviewEventId` handling.
+- Added Fastify due-count/session/rating/completion routes through the authenticated Next.js BFF.
+- Added a responsive German-first review screen with answer reveal, interval-labelled recall controls, `Space` and `1–4` keyboard operation, retry-safe double-submit protection, recovery choice, loading/empty/error/completed states, and entry points from Practice and Vocabulary.
+- Strengthened the repository review by verifying ownership on both the review state and joined vocabulary word. Split the review orchestration and UI state panels into focused modules.
+- Mutation-checked the scheduler clamp: changing the maximum from `3.0` to `2.9` caused the focused test to fail as intended, then the production rule was restored.
+
+Observed verification:
+
+| Command | Result |
+|---|---|
+| `npm test` | Passed: 23 files, 93 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings after resolving React purity/effect findings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and Next.js production routes including `/practice/review` compiled |
+| `npm run test:e2e` | Passed: 10 tests across desktop Chromium and Pixel 7 emulation; keyboard review, no horizontal overflow, and zero axe violations verified |
+| `npm run test:integration` | Passed after the Atlas IP access entry became active: 3 files, 15 tests against the guarded Atlas `_test` database |
+
+Phase 03 acceptance criteria are fully satisfied. Phase 04 remains not started.
