@@ -262,3 +262,23 @@ Observed verification:
 | `npm run format:check` | Passed |
 | `npm run build` | Passed for shared, API, and web workspaces |
 | Live API smoke check | Passed: dashboard, vocabulary, vocabulary sets, and A1 learning path returned HTTP 200 after a clean API restart |
+
+### 2026-10-26 — Phase 04 BFF route allowlist fix
+
+Implemented:
+
+- Reproduced the browser-facing 404 responses for `dashboard`, `learning-path`, `lessons`, and `lesson-progress` at the authenticated Next.js domain proxy.
+- Added the four Phase 04 resource roots to the existing BFF allowlist while preserving rejection of unapproved roots.
+- Added parameterized regression coverage for all four Phase 04 paths.
+
+Observed verification:
+
+| Check | Result |
+|---|---|
+| Focused regression test | Failed with four HTTP 404 assertions before the fix, then passed: 1 file, 8 tests |
+| `npm test` | Passed: 28 files, 111 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed after formatting the new test cases |
+| `npm run build` | Passed for shared, API, and web workspaces |
+| Live BFF smoke check | Passed: `/api/domain/dashboard` and `/api/domain/learning-path?level=A1` returned HTTP 200 with seeded data |

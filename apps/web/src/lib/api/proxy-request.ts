@@ -4,6 +4,10 @@ type DomainFetcher = (
 ) => Promise<Response>;
 
 const allowedRoots = new Set([
+  "dashboard",
+  "learning-path",
+  "lesson-progress",
+  "lessons",
   "review-sessions",
   "reviews",
   "vocabulary",
