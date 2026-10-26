@@ -3,6 +3,26 @@ import { describe, expect, it, vi } from "vitest";
 import { proxyDomainRequest } from "@/lib/api/proxy-request";
 
 describe("proxyDomainRequest", () => {
+  it.each([
+    [["dashboard"]],
+    [["learning-path"]],
+    [["lessons", "a1-begruessung-und-vorstellung"]],
+    [["lesson-progress", "000000000000000000000101"]],
+  ])("forwards the Phase 04 domain path %j", async (path) => {
+    const fetcher = vi.fn(async () => Response.json({ ok: true }));
+    const response = await proxyDomainRequest({
+      baseUrl: "http://api.test/api/v1",
+      fetcher,
+      internalApiSecret: "trusted-secret",
+      path,
+      request: new Request(`http://localhost/api/domain/${path.join("/")}`),
+      userId: "000000000000000000000001",
+    });
+
+    expect(response.status).toBe(200);
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
+
   it("injects the trusted identity and never forwards browser auth headers", async () => {
     const fetcher = vi.fn<
       (input: string | URL | Request, init?: RequestInit) => Promise<Response>
