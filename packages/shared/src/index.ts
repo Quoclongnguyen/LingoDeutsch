@@ -46,11 +46,13 @@ export {
   lessonContentSchema,
   lessonProgressInputSchema,
   lessonProgressStatuses,
+  publicLessonActivitySchema,
   lessonVocabularySaveInputSchema,
   type LearningPathQuery,
   type LessonActivity,
   type LessonContent,
   type LessonProgressInput,
+  type PublicLessonActivity,
   type LessonVocabularySaveInput,
 } from "./validation/learning";
 export {
@@ -64,6 +66,7 @@ export {
   grammarTopicListResponseSchema,
   grammarTopicSummarySchema,
   type GrammarTopicContent,
+  type GrammarTopicContentInput,
   type GrammarTopicDetail,
   type GrammarTopicListQuery,
   type GrammarTopicListResponse,

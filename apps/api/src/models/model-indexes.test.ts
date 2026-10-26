@@ -2,6 +2,7 @@ import type { IndexDefinition, IndexOptions } from "mongoose";
 import { describe, expect, it } from "vitest";
 
 import { LessonProgressModel } from "@/models/lesson-progress";
+import { ExerciseAttemptModel } from "@/models/exercise-attempt";
 import { GrammarTopicModel } from "@/models/grammar-topic";
 import { ReviewLogModel } from "@/models/review-log";
 import { ReviewSessionModel } from "@/models/review-session";
@@ -87,5 +88,21 @@ describe("Phase 01 model indexes", () => {
 
     expect(hasIndex(indexes, { slug: 1 }, { unique: true })).toBe(true);
     expect(hasIndex(indexes, { level: 1, order: 1, published: 1 })).toBe(true);
+  });
+
+  it("defines idempotency and bounded owner history indexes for exercise attempts", () => {
+    const indexes = ExerciseAttemptModel.schema.indexes();
+
+    expect(hasIndex(indexes, { attemptEventId: 1 }, { unique: true })).toBe(
+      true,
+    );
+    expect(
+      hasIndex(indexes, {
+        userId: 1,
+        sourceType: 1,
+        sourceId: 1,
+        completedAt: -1,
+      }),
+    ).toBe(true);
   });
 });

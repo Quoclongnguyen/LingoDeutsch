@@ -1,6 +1,7 @@
 import {
   grammarTopicContentSchema,
   grammarTopicListQuerySchema,
+  toPublicExercise,
   type GrammarTopicContent,
 } from "@lingo-deutsch/shared";
 import {
@@ -52,6 +53,7 @@ export function toGrammarTopicDetail(
   return {
     compactTable: topic.compactTable,
     examples: topic.examples,
+    exercises: topic.exercises.map(toPublicExercise),
     id: rawTopic._id.toString(),
     level: topic.level,
     order: topic.order,

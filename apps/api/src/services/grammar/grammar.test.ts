@@ -11,6 +11,7 @@ describe("grammar topic mapping", () => {
           { de: "Ich bin Long.", vi: "Tôi là Long." },
           { de: "Du bist Anna.", vi: "Bạn là Anna." },
         ],
+        exercises: [],
         level: "A1",
         order: 3,
         published: true,
