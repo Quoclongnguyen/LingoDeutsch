@@ -128,10 +128,12 @@ export async function buildApi({
     if (
       error instanceof ReviewSessionStateError ||
       error instanceof ReviewEventConflictError ||
-      error instanceof LessonProgressConflictError ||
-      error instanceof ExerciseAttemptConflictError
+      error instanceof LessonProgressConflictError
     ) {
       return reply.code(409).send({ error: "review_conflict" });
+    }
+    if (error instanceof ExerciseAttemptConflictError) {
+      return reply.code(409).send({ error: "exercise_attempt_conflict" });
     }
     if (error instanceof InvalidExerciseAnswersError) {
       return reply.code(400).send({ error: "invalid_exercise_answers" });

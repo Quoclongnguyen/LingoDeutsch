@@ -21,6 +21,11 @@ type SourceView = {
   title: string;
 };
 
+type LoadState =
+  | { requestKey: string; status: "loading" }
+  | { error: string; requestKey: string; status: "error" }
+  | { requestKey: string; source: SourceView; status: "ready" };
+
 export function ExerciseSourceWorkspace({
   slug,
   sourceType,
@@ -28,9 +33,12 @@ export function ExerciseSourceWorkspace({
   slug: string;
   sourceType: ExerciseSourceType;
 }) {
-  const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
-  const [source, setSource] = useState<SourceView>();
+  const requestKey = `${sourceType}:${slug}:${reloadKey}`;
+  const [loadState, setLoadState] = useState<LoadState>({
+    requestKey: "",
+    status: "loading",
+  });
 
   useEffect(() => {
     let active = true;
@@ -42,50 +50,62 @@ export function ExerciseSourceWorkspace({
       .then((data) => {
         if (!active) return;
         if (sourceType === "lesson" && "content" in data) {
-          setSource({
-            exercises: data.content.activities.flatMap((activity) =>
-              activity.type === "exercise_set" ? activity.exercises : [],
-            ),
-            id: data.id,
-            title: `Luyện bài ${data.titleDe}`,
+          setLoadState({
+            requestKey,
+            source: {
+              exercises: data.content.activities.flatMap((activity) =>
+                activity.type === "exercise_set" ? activity.exercises : [],
+              ),
+              id: data.id,
+              title: `Luyện bài ${data.titleDe}`,
+            },
+            status: "ready",
           });
           return;
         }
         if (sourceType === "grammar_topic" && "exercises" in data) {
-          setSource({
-            exercises: data.exercises,
-            id: data.id,
-            title: `Luyện ngữ pháp: ${data.titleDe}`,
+          setLoadState({
+            requestKey,
+            source: {
+              exercises: data.exercises,
+              id: data.id,
+              title: `Luyện ngữ pháp: ${data.titleDe}`,
+            },
+            status: "ready",
           });
         }
       })
       .catch((caught: unknown) => {
         if (active) {
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Chưa thể tải bài luyện tập.",
-          );
+          setLoadState({
+            error:
+              caught instanceof Error
+                ? caught.message
+                : "Chưa thể tải bài luyện tập.",
+            requestKey,
+            status: "error",
+          });
         }
       });
     return () => {
       active = false;
     };
-  }, [reloadKey, slug, sourceType]);
+  }, [requestKey, slug, sourceType]);
 
-  if (error) {
+  const currentState =
+    loadState.requestKey === requestKey
+      ? loadState
+      : ({ requestKey, status: "loading" } satisfies LoadState);
+
+  if (currentState.status === "error") {
     return (
       <EmptyState
         title="Chưa thể tải bài luyện tập"
-        description={`${error} Hãy kiểm tra kết nối và thử lại.`}
+        description={`${currentState.error} Hãy kiểm tra kết nối và thử lại.`}
         action={
           <button
             className="button button--secondary"
-            onClick={() => {
-              setError("");
-              setSource(undefined);
-              setReloadKey((key) => key + 1);
-            }}
+            onClick={() => setReloadKey((key) => key + 1)}
             type="button"
           >
             <RefreshCw aria-hidden="true" size={18} /> Thử lại
@@ -94,7 +114,8 @@ export function ExerciseSourceWorkspace({
       />
     );
   }
-  if (!source) return <LoadingSkeleton />;
+  if (currentState.status !== "ready") return <LoadingSkeleton />;
+  const { source } = currentState;
 
   return (
     <div className="exercise-page">

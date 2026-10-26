@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import { vi } from "vitest";
 
 import { buildApi } from "@/app";
+import { ExerciseAttemptConflictError } from "@/services/exercise/exercise-attempts";
 
 describe("Lingo Deutsch API", () => {
   it("reports readiness from the versioned backend health route", async () => {
@@ -91,6 +92,46 @@ describe("Lingo Deutsch API", () => {
       query: expect.objectContaining({ q: "Termin" }),
       userId: authenticatedUserId,
     });
+    await api.close();
+  });
+
+  it("returns an exercise-specific conflict code for reused attempt events", async () => {
+    const userId = new Types.ObjectId().toHexString();
+    const sourceId = new Types.ObjectId().toHexString();
+    const api = await buildApi({
+      exerciseAttemptServices: {
+        submitExerciseAttempt: vi.fn(async () => {
+          throw new ExerciseAttemptConflictError();
+        }),
+      },
+      internalApiSecret: "test-internal-api-secret-value-123",
+      logger: false,
+      webOrigin: "http://localhost:3000",
+    });
+
+    const response = await api.inject({
+      headers: {
+        authorization: "Bearer test-internal-api-secret-value-123",
+        "x-lingo-user-id": userId,
+      },
+      method: "POST",
+      payload: {
+        answers: [
+          {
+            answer: "formal",
+            exerciseId: "formal-address",
+            type: "multiple_choice",
+          },
+        ],
+        attemptEventId: "attempt-app-test-0001",
+        sourceId,
+        sourceType: "lesson",
+      },
+      url: "/api/v1/exercise-attempts",
+    });
+
+    expect(response.statusCode).toBe(409);
+    expect(response.json()).toEqual({ error: "exercise_attempt_conflict" });
     await api.close();
   });
 });
