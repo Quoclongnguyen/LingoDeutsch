@@ -241,3 +241,24 @@ Observed verification:
 The first Playwright attempt after generating fresh route types encountered a Next.js development-cache warm-up reload on three desktop cases (9 passed, 3 timed out while still showing loading states). An immediate rerun against the stabilized isolated `.next-e2e` cache passed all 12 cases without code changes.
 
 Phase 04 acceptance criteria are fully satisfied. Phase 05 remains not started.
+
+### 2026-10-26 — API database startup regression fix
+
+Implemented:
+
+- Reproduced fresh-server failures where read-only dashboard, learning-path, vocabulary, and vocabulary-set requests timed out because no code had opened the Mongoose connection yet.
+- Added a fail-fast API bootstrap boundary that completes `mongoose.connect()` before Fastify starts accepting requests.
+- Added regression coverage for connection-before-listen ordering and for refusing to listen when MongoDB startup fails.
+- Mutation-checked the ordering test: moving `listen()` before the database connection caused both focused tests to fail, then the correct implementation was restored.
+
+Observed verification:
+
+| Check | Result |
+|---|---|
+| Focused regression test | Passed: 1 file, 2 tests after reproducing the missing bootstrap module |
+| `npm test` | Passed: 28 files, 107 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed for shared, API, and web workspaces |
+| Live API smoke check | Passed: dashboard, vocabulary, vocabulary sets, and A1 learning path returned HTTP 200 after a clean API restart |
