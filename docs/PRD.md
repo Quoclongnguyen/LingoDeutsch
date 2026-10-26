@@ -1,7 +1,7 @@
 # PRD — Lingo Deutsch
 
-> Phiên bản: 1.0
-> Trạng thái: Sẵn sàng triển khai MVP
+> Phiên bản: 1.1
+> Trạng thái: MVP cốt lõi hoàn thành đến Phase 04; phạm vi mở rộng Phase 05–07 đã được phê duyệt
 > Đối tượng sử dụng ban đầu: Một người học tiếng Đức từ Việt Nam
 > Mục tiêu dài hạn: Hỗ trợ hành trình học, thi chứng chỉ, học tập và làm việc tại Đức
 > Stitch project: `13171068280736042527`
@@ -108,6 +108,9 @@ Người Việt đang học tiếng Đức ở mức A1–A2, có kế hoạch h
 - Thống kê cơ bản, có nguồn dữ liệu rõ ràng.
 - Chế độ sáng/tối và lưu lựa chọn giao diện.
 - Responsive desktop/mobile.
+- Thư viện ngữ pháp A1 có giải thích tiếng Việt, ví dụ Đức–Việt và liên kết với bài học.
+- Ba dạng bài tập tương tác: multiple choice, fill in the blank và word ordering.
+- Kết quả cuối bài, làm lại bài tập và lịch sử attempt ở mức tối thiểu cần thiết.
 
 ### 6.2 Không bao gồm trong MVP
 
@@ -278,6 +281,26 @@ Công cụ phụ gồm Từ điển, Chia động từ và Tra Artikel. Chúng k
 - MVP có thể dùng Web Speech API làm phương án ban đầu.
 - Khi không có giọng phù hợp, hiển thị lỗi có hướng dẫn thay vì nút không hoạt động.
 - Không tự động phát âm khi mở trang.
+
+### FR-13 — Thư viện ngữ pháp A1
+
+- Hiển thị danh sách chủ đề ngữ pháp A1 theo thứ tự học, có bộ lọc cấp độ nhưng MVP chỉ cần dữ liệu A1.
+- Mỗi chủ đề có tiêu đề tiếng Đức và tiếng Việt, giải thích ngắn bằng tiếng Việt, quy tắc có cấu trúc, ví dụ Đức–Việt và tối đa một bảng gọn khi thật sự cần.
+- Nội dung ngữ pháp không được lưu hoặc render dưới dạng HTML tùy ý.
+- Chủ đề ngữ pháp liên kết đến bài học liên quan bằng slug ổn định.
+- Bài học đã hoàn thành có thể được mở lại ở chế độ luyện lại mà không hạ trạng thái hoàn thành hoặc xóa lịch sử cũ.
+- Nội dung seed tối thiểu gồm: cách chào hỏi và xưng hô, đại từ nhân xưng, `sein` và `haben`, `der/die/das`, chia động từ thì Präsens.
+
+### FR-14 — Bài tập tương tác
+
+- MVP hỗ trợ đúng ba dạng: `multiple_choice`, `fill_blank` và `word_ordering`.
+- Mỗi màn hình chỉ yêu cầu một quyết định học tập; word ordering phải có phương án sử dụng bằng bàn phím và không phụ thuộc hoàn toàn vào kéo-thả.
+- Server chấm điểm từ nguồn nội dung tin cậy; API đọc không trả answer key trước khi người học nộp bài.
+- Sau mỗi câu, giao diện hiển thị đúng/sai kèm giải thích ngắn khi dữ liệu có sẵn; trạng thái không chỉ dựa vào màu.
+- Cuối bài hiển thị điểm chính xác, số câu đúng/sai và cho phép làm lại.
+- Mỗi lần nộp có `attemptEventId` duy nhất để chống ghi trùng. Chỉ lưu summary cần thiết: nguồn bài, điểm, tổng số câu, các exercise ID sai và thời điểm hoàn thành.
+- Exercise attempts thuộc dữ liệu cá nhân và luôn được lọc bằng `userId` từ session phía server.
+- Việc chấm bài tập không thay đổi thuật toán hoặc trạng thái SRS hiện có.
 
 ## 10. Thuật toán SRS cho MVP
 
@@ -493,7 +516,51 @@ Các khoảng dưới đây là giá trị tính toán; giao diện phải hiể
 }
 ```
 
-### 11.10 Index bắt buộc
+### 11.10 Collection `grammarTopics`
+
+```ts
+{
+  _id: ObjectId,
+  slug: string,
+  level: "A1" | "A2" | "B1" | "B2" | "C1",
+  order: number,
+  titleDe: string,
+  titleVi: string,
+  summaryVi: string,
+  rules: object[],
+  examples: [{ de: string, vi: string }],
+  compactTable?: object,
+  relatedLessonSlugs: string[],
+  exercises: object[],
+  published: boolean,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+`rules`, `compactTable` và `exercises` phải được kiểm tra bằng Zod discriminated unions hoặc object schemas có giới hạn; không chấp nhận arbitrary HTML.
+
+### 11.11 Collection `exerciseAttempts`
+
+```ts
+{
+  _id: ObjectId,
+  attemptEventId: string,
+  userId: ObjectId,
+  sourceType: "lesson" | "grammar_topic",
+  sourceId: ObjectId,
+  score: number,
+  total: number,
+  incorrectExerciseIds: string[],
+  completedAt: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+MVP không lưu toàn bộ free-form answer hoặc từng phím nhập. Nếu cần điều tra lỗi chấm điểm, log kỹ thuật phải tránh nội dung cá nhân và không thay thế attempt record.
+
+### 11.12 Index bắt buộc
 
 ```ts
 vocabularyWords: { userId: 1, normalizedHeadword: 1 } unique where isArchived = false
@@ -511,6 +578,10 @@ reviewLogs: { userId: 1, wordId: 1, reviewedAt: -1 }
 reviewSessions: { userId: 1, status: 1, updatedAt: -1 }
 vocabularySets: { userId: 1, name: 1 }
 lessonProgress: { userId: 1, lessonId: 1 } unique
+grammarTopics: { slug: 1 } unique
+grammarTopics: { level: 1, order: 1, published: 1 }
+exerciseAttempts: { attemptEventId: 1 } unique
+exerciseAttempts: { userId: 1, sourceType: 1, sourceId: 1, completedAt: -1 }
 ```
 
 ## 12. API và server actions
@@ -550,6 +621,18 @@ Tên endpoint chỉ là hợp đồng đề xuất; có thể dùng Route Handle
 - `GET /api/lessons/:slug`.
 - `PATCH /api/lesson-progress/:lessonId`.
 - `GET /api/dashboard` — tổng hợp dữ liệu cần cho trang Hôm nay.
+
+### Ngữ pháp
+
+- `GET /api/grammar-topics?level=A1` — danh sách chủ đề đã xuất bản, không trả answer key.
+- `GET /api/grammar-topics/:slug` — nội dung có cấu trúc, ví dụ và liên kết lesson.
+
+### Bài tập
+
+- `POST /api/exercise-attempts` — chấm bài ở server và lưu attempt summary bằng `attemptEventId` idempotent.
+- `GET /api/exercise-attempts?sourceType=...&sourceId=...&limit=...` — lịch sử rút gọn thuộc người dùng hiện tại; giới hạn kết quả bắt buộc.
+
+Các đường dẫn thực tế trong Fastify tiếp tục dùng prefix `/api/v1`. Browser chỉ truy cập qua Next.js BFF `/api/domain/*`; resource root mới phải được thêm vào allowlist với regression test.
 
 ## 13. Kiến trúc kỹ thuật đề xuất
 
@@ -664,6 +747,9 @@ MVP cần dữ liệu mẫu đủ để kiểm thử bằng sản phẩm thật:
 - Mỗi từ có ít nhất một nghĩa tiếng Việt.
 - Ít nhất 20 từ có câu ví dụ song ngữ.
 - Một bộ từ theo bài học `Giờ giấc & lịch hẹn`.
+- Năm chủ đề ngữ pháp A1 có cấu trúc: chào hỏi và xưng hô, đại từ nhân xưng, `sein/haben`, `der/die/das`, Präsens.
+- Mỗi chủ đề ngữ pháp có ít nhất hai ví dụ Đức–Việt và liên kết đến tối thiểu một lesson phù hợp.
+- Có dữ liệu kiểm chứng cho đủ ba dạng bài tập; ba lesson chưa có activities được bổ sung nội dung tối thiểu thay vì bị thay thế.
 
 Ví dụ bắt buộc:
 
@@ -719,6 +805,26 @@ Ví dụ bắt buộc:
 - Phiên ôn có thể hoàn thành chỉ bằng bàn phím.
 - Các nút chính có accessible name và focus-visible.
 
+### AC-08 — Thư viện ngữ pháp
+
+- Danh sách A1 trả đúng thứ tự và chỉ hiển thị chủ đề đã xuất bản.
+- Mở một chủ đề hiển thị giải thích tiếng Việt, ví dụ Đức–Việt và lesson liên quan mà không render HTML tùy ý.
+- Người học có thể mở lại lesson đã hoàn thành để luyện mà trạng thái `completed` và lịch sử cũ không bị thay đổi.
+
+### AC-09 — Bài tập tương tác
+
+- Người học hoàn thành được multiple choice, fill in the blank và word ordering bằng chuột, cảm ứng hoặc bàn phím.
+- API đọc không làm lộ đáp án; server trả kết quả đúng/sai và feedback sau khi nộp.
+- Kết quả cuối bài có score/total chính xác và nút làm lại tạo một attempt mới.
+- Gửi lại cùng `attemptEventId` không tạo attempt thứ hai.
+- Người dùng không thể đọc attempt của `userId` khác bằng cách thay URL, query hoặc request body.
+
+### AC-10 — Vòng học tích hợp
+
+- Dashboard hiển thị tiến độ tổng hợp A1 từ dữ liệu lesson thật, không chỉ milestone của module đầu.
+- Luồng Dashboard → Lesson → Grammar → Exercise → lưu từ → Vocabulary/SRS không có dead link.
+- Việc hoàn thành exercise không làm thay đổi review schedule nếu người học chưa thực hiện một SRS rating hợp lệ.
+
 ## 18. Test plan tối thiểu
 
 ### Unit tests
@@ -729,6 +835,9 @@ Ví dụ bắt buộc:
 - Xử lý timestamp và múi giờ.
 - Chuẩn hóa headword nhưng giữ umlaut và `ß`.
 - Validation danh từ thiếu article.
+- Validation nội dung grammar không chấp nhận HTML hoặc exercise type ngoài allowlist.
+- Chấm điểm deterministic cho multiple choice, fill in the blank và word ordering.
+- Chuẩn hóa fill-in answer chỉ theo quy tắc được phê duyệt, không tự ý bỏ umlaut hoặc `ß`.
 
 ### Integration tests
 
@@ -737,6 +846,8 @@ Ví dụ bắt buộc:
 - Rating tạo log và cập nhật state.
 - Idempotency của review event.
 - Import preview phát hiện dòng lỗi và trùng.
+- Grammar list/detail chỉ trả chủ đề published và liên kết đúng lesson.
+- Exercise attempt được chấm server-side, user-scoped và idempotent theo `attemptEventId`.
 
 ### End-to-end tests
 
@@ -745,6 +856,9 @@ Ví dụ bắt buộc:
 3. Hiện đáp án → chọn `Tốt` → hoàn thành phiên → thấy ngày ôn mới.
 4. Đổi light/dark → refresh → preference được giữ.
 5. Mobile viewport → thêm từ và hoàn thành một lượt ôn.
+6. Mở Grammar A1 → đọc chủ đề → mở lesson liên quan → quay lại luyện tập.
+7. Hoàn thành đủ ba exercise types → xem kết quả → làm lại mà không mất attempt trước.
+8. Mở lại lesson completed → luyện lại mà không hạ tiến độ đã lưu.
 
 ## 19. Kế hoạch triển khai
 
@@ -786,14 +900,27 @@ Ví dụ bắt buộc:
 - Cho phép lưu từ từ bài học.
 - Dựng lịch sử hoạt động và tiến độ cơ bản.
 
-### Giai đoạn 5 — Hoàn thiện
+### Giai đoạn 5 — Thư viện ngữ pháp
 
-- Responsive mobile.
-- Accessibility audit.
-- Playwright E2E.
-- Kiểm tra trạng thái loading, empty và error.
-- Triển khai preview trên Vercel.
-- Kiểm thử dữ liệu thực trong tối thiểu bảy ngày trước khi mở rộng tính năng.
+- Tạo grammar contracts, model, indexes, repository, service và API.
+- Seed idempotent năm chủ đề A1 có nội dung cấu trúc.
+- Dựng danh sách/detail ngữ pháp, liên kết lesson và chế độ luyện lại lesson completed.
+- Giữ năm destination điều hướng hiện tại; Grammar là nhánh bên trong `Học`.
+
+### Giai đoạn 6 — Exercise engine
+
+- Tạo shared contracts cho multiple choice, fill in the blank và word ordering.
+- Chấm điểm ở server, lưu attempt summary idempotent và giữ ownership boundary.
+- Dựng feedback từng câu, kết quả cuối và luồng làm lại.
+- Bổ sung activities tối thiểu cho ba lesson đang trống mà không viết lại Vocabulary hoặc SRS.
+
+### Giai đoạn 7 — Tích hợp, QA và preview
+
+- Kết nối Dashboard → Lesson → Grammar → Exercise → Vocabulary/SRS.
+- Hiển thị tiến độ tổng hợp A1 và dữ liệu progress thực.
+- Responsive mobile, accessibility audit, Playwright E2E, security review và kiểm tra loading/empty/error.
+- Triển khai preview chỉ sau khi có phê duyệt riêng cho hạ tầng và môi trường.
+- Kiểm thử dữ liệu thực trong tối thiểu bảy ngày trước khi mở rộng thêm tính năng.
 
 ## 20. Definition of Done
 
@@ -819,6 +946,12 @@ Một hạng mục chỉ hoàn thành khi:
 - Sea Glass là màu nhấn thương hiệu duy nhất.
 - Thuật toán MVP là SM-2 đơn giản hóa, có thể thay bằng FSRS sau khi có đủ review history.
 - Ứng dụng là sản phẩm học cá nhân; không có chức năng thương mại hoặc xã hội trong MVP.
+- Giữ nguyên năm destination chính `Hôm nay`, `Học`, `Từ vựng`, `Luyện tập`, `Tiến độ`; Grammar nằm trong `Học` thay vì thay toàn bộ navigation.
+- Chưa tạo collection `courses`; lộ trình A1 tiếp tục dùng `level`, `moduleOrder` và `lessonOrder` cho đến khi có nhiều chương trình độc lập.
+- Grammar dùng collection nội dung toàn cục; exercise attempt là dữ liệu user-scoped.
+- Exercise được chấm ở server và answer key không được trả trước submission.
+- Chỉ lưu attempt summary cần thiết; replay lesson không hạ hoặc xóa completion hiện có.
+- Phase 05 là Grammar Library, Phase 06 là Exercise Engine, Phase 07 là Integration/QA/Preview. Deployment vẫn cần phê duyệt riêng.
 
 ## 22. Rủi ro và biện pháp giảm thiểu
 
