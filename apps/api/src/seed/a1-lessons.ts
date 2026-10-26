@@ -3,8 +3,32 @@ import {
   type VocabularySeedItem,
 } from "@lingo-deutsch/shared";
 
+export type LessonActivity =
+  | {
+      id: string;
+      instructionVi: string;
+      lines: Array<{ de: string; speaker: string; vi: string }>;
+      titleDe: string;
+      type: "dialogue";
+    }
+  | {
+      headwords: string[];
+      id: string;
+      instructionVi: string;
+      type: "vocabulary";
+    }
+  | {
+      correctOptionId: string;
+      feedbackVi: string;
+      id: string;
+      instructionVi: string;
+      options: Array<{ id: string; text: string }>;
+      questionDe: string;
+      type: "check";
+    };
+
 export type LessonSeed = {
-  content: { activities: unknown[] };
+  content: { activities: LessonActivity[] };
   estimatedMinutes: number;
   lessonOrder: number;
   level: "A1";
@@ -23,7 +47,58 @@ function item(input: Record<string, unknown>): VocabularySeedItem {
 
 export const A1_LESSONS: LessonSeed[] = [
   {
-    content: { activities: [] },
+    content: {
+      activities: [
+        {
+          id: "dialogue-introduction",
+          instructionVi:
+            "Đọc đoạn hội thoại và chú ý cách xưng hô lịch sự bằng Sie.",
+          lines: [
+            {
+              de: "Guten Tag. Ich heiße Anna Keller. Wie heißen Sie?",
+              speaker: "Anna",
+              vi: "Xin chào. Tôi tên là Anna Keller. Ông/bà tên là gì?",
+            },
+            {
+              de: "Guten Tag. Ich heiße Long Nguyen. Ich komme aus Vietnam.",
+              speaker: "Long",
+              vi: "Xin chào. Tôi tên là Long Nguyen. Tôi đến từ Việt Nam.",
+            },
+            {
+              de: "Freut mich. Welche Sprachen sprechen Sie?",
+              speaker: "Anna",
+              vi: "Rất vui được gặp ông/bà. Ông/bà nói những ngôn ngữ nào?",
+            },
+          ],
+          titleDe: "Begrüßung im Sprachkurs",
+          type: "dialogue",
+        },
+        {
+          headwords: ["Name", "heißen", "kommen", "sich vorstellen"],
+          id: "vocabulary-introduction",
+          instructionVi:
+            "Chọn những từ bạn muốn đưa vào kho để ôn lại sau bài học.",
+          type: "vocabulary",
+        },
+        {
+          correctOptionId: "formal-introduction",
+          feedbackVi:
+            "Trong tình huống trang trọng, dùng Ich heiße… và hỏi lại bằng Wie heißen Sie?",
+          id: "check-introduction",
+          instructionVi: "Chọn câu giới thiệu phù hợp trong lần gặp đầu tiên.",
+          options: [
+            {
+              id: "formal-introduction",
+              text: "Guten Tag. Ich heiße Long. Wie heißen Sie?",
+            },
+            { id: "informal-command", text: "Hallo! Sag deinen Namen!" },
+            { id: "farewell", text: "Auf Wiedersehen. Bis morgen." },
+          ],
+          questionDe: "Wie stellen Sie sich höflich vor?",
+          type: "check",
+        },
+      ],
+    },
     estimatedMinutes: 15,
     lessonOrder: 1,
     level: "A1",

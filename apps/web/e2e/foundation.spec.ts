@@ -47,13 +47,41 @@ test("sign-in foundation is usable on desktop and mobile", async ({ page }) => {
 test("authenticated learner sees the responsive application shell", async ({
   page,
 }, testInfo) => {
+  await page.route("**/api/domain/dashboard", async (route) =>
+    route.fulfill({
+      json: {
+        due: { count: 0, words: [] },
+        milestone: {
+          completedLessons: 0,
+          titleDe: "Ankommen und vorstellen",
+          titleVi: "Làm quen và giới thiệu",
+          totalLessons: 2,
+        },
+        nextLesson: {
+          estimatedMinutes: 15,
+          objectiveVi: "Tự giới thiệu lịch sự.",
+          slug: "a1-begruessung-und-vorstellung",
+          titleDe: "Begrüßung und Vorstellung",
+          titleVi: "Chào hỏi và giới thiệu",
+        },
+        practicalGoal: {
+          de: "Einen Termin vereinbaren",
+          vi: "Đặt một cuộc hẹn bằng tiếng Đức.",
+        },
+        recentActivity: [],
+        weeklyGoal: { completed: 0, target: 5 },
+      },
+    }),
+  );
   await authenticate(page);
   await page.goto("/today");
 
   await expect(
     page.getByRole("heading", { name: "Hôm nay", level: 1 }),
+  ).toBeVisible({ timeout: 15_000 });
+  await expect(
+    page.getByRole("heading", { name: "Begrüßung und Vorstellung" }),
   ).toBeVisible();
-  await expect(page.getByText("Chào hỏi và giới thiệu")).toBeVisible();
 
   const navigationName =
     testInfo.project.name === "mobile-chromium"

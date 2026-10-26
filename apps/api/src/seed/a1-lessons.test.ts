@@ -57,4 +57,19 @@ describe("A1 lesson seed", () => {
       expect(Boolean(noun.plural) || noun.noPlural === true).toBe(true);
     }
   });
+
+  it("provides one complete sample lesson with stable activity identifiers", () => {
+    const sample = A1_LESSONS[0];
+    const activityIds = sample?.content.activities.map(
+      (activity) => activity.id,
+    );
+
+    expect(sample?.slug).toBe("a1-begruessung-und-vorstellung");
+    expect(activityIds).toEqual([
+      "dialogue-introduction",
+      "vocabulary-introduction",
+      "check-introduction",
+    ]);
+    expect(sample?.content.activities.at(-1)?.type).toBe("check");
+  });
 });

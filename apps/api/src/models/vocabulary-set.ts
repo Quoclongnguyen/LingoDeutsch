@@ -18,6 +18,14 @@ const vocabularySetSchema = new Schema(
 );
 
 vocabularySetSchema.index({ userId: 1, name: 1 });
+vocabularySetSchema.index(
+  { userId: 1, sourceLessonId: 1 },
+  {
+    name: "unique_active_lesson_set_per_user",
+    partialFilterExpression: { isArchived: false, kind: "lesson" },
+    unique: true,
+  },
+);
 
 export type VocabularySet = InferSchemaType<typeof vocabularySetSchema>;
 

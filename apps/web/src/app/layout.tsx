@@ -29,7 +29,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${jakarta.variable} ${jetbrainsMono.variable}`}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

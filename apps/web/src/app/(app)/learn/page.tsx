@@ -1,10 +1,9 @@
-import { EmptyState } from "@/components/states/empty-state";
+import type { Metadata } from "next";
+
+import { LearningPathWorkspace } from "@/components/learning/learning-path-workspace";
+
+export const metadata: Metadata = { title: "Lộ trình A1" };
 
 export default function LearnPage() {
-  return (
-    <EmptyState
-      title="Lộ trình A1 đang được chuẩn bị"
-      description="Phase 04 sẽ kết nối module, bài học và kết quả thực tế vào không gian này."
-    />
-  );
+  return <LearningPathWorkspace />;
 }

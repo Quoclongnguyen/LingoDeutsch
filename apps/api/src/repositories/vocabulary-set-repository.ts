@@ -23,6 +23,32 @@ export async function createVocabularySetRecord(
   });
 }
 
+export async function findOrCreateLessonVocabularySet(
+  userId: string,
+  lesson: { _id: Types.ObjectId; titleVi: string },
+  session: ClientSession,
+) {
+  return VocabularySetModel.findOneAndUpdate(
+    {
+      isArchived: false,
+      kind: "lesson",
+      sourceLessonId: lesson._id,
+      userId: objectId(userId),
+    },
+    {
+      $setOnInsert: {
+        description: "Từ vựng được lưu trực tiếp từ bài học.",
+        isArchived: false,
+        kind: "lesson",
+        name: lesson.titleVi,
+        sourceLessonId: lesson._id,
+        userId: objectId(userId),
+      },
+    },
+    { returnDocument: "after", session, upsert: true },
+  ).exec();
+}
+
 export async function findActiveVocabularySetForUser(
   userId: string,
   setId: string,
