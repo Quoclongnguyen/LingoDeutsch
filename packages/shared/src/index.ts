@@ -68,3 +68,20 @@ export {
   type GrammarTopicListQuery,
   type GrammarTopicListResponse,
 } from "./validation/grammar";
+export {
+  exerciseAnswerSchema,
+  exerciseAttemptListQuerySchema,
+  exerciseSourceTypes,
+  fillBlankExerciseSchema,
+  internalExerciseSchema,
+  multipleChoiceExerciseSchema,
+  publicExerciseSchema,
+  submitExerciseAttemptSchema,
+  toPublicExercise,
+  wordOrderingExerciseSchema,
+  type ExerciseAnswer,
+  type ExerciseSourceType,
+  type InternalExercise,
+  type PublicExercise,
+  type SubmitExerciseAttempt,
+} from "./validation/exercise";
