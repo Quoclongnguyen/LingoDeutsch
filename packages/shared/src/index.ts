@@ -40,3 +40,16 @@ export {
   parseVocabularyImport,
   type VocabularyImportRow,
 } from "./vocabulary/parse-vocabulary-import";
+export {
+  learningPathQuerySchema,
+  lessonActivitySchema,
+  lessonContentSchema,
+  lessonProgressInputSchema,
+  lessonProgressStatuses,
+  lessonVocabularySaveInputSchema,
+  type LearningPathQuery,
+  type LessonActivity,
+  type LessonContent,
+  type LessonProgressInput,
+  type LessonVocabularySaveInput,
+} from "./validation/learning";

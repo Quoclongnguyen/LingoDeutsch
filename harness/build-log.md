@@ -212,3 +212,32 @@ Observed verification:
 | `npm run test:integration` | Passed after the Atlas IP access entry became active: 3 files, 15 tests against the guarded Atlas `_test` database |
 
 Phase 03 acceptance criteria are fully satisfied. Phase 04 remains not started.
+
+### 2026-10-26 — Phase 04 Today and A1 learning path complete
+
+Implemented:
+
+- Added shared Zod contracts, Fastify routes, user-scoped repositories, and services for the A1 learning path, lesson player, progress, dashboard, recent activity, and lesson vocabulary saves.
+- Expanded the A1 seed into four published lessons across two ordered modules and added one complete interactive lesson with dialogue, vocabulary-save, and comprehension-check activities.
+- Enforced sequential lesson prerequisites in both the returned path and the progress service so direct API calls cannot advance a locked lesson.
+- Added an automatic per-lesson vocabulary set and transactional, idempotent save-word behavior. Existing words retain their original `sourceLessonId` while gaining the lesson-set association.
+- Replaced the Today and Learn placeholders with data-backed, responsive light/dark experiences plus the focused lesson player and meaningful loading, empty, error, locked, saved, completed, and no-review-due states.
+- Kept browser ownership behind the authenticated Next.js BFF and scoped all personal MongoDB queries by the trusted user identifier.
+- Added route, service, component, Atlas integration, and Playwright coverage. Mutation-checking the prerequisite condition proved the lock tests fail when the rule is inverted.
+
+Observed verification:
+
+| Command | Result |
+|---|---|
+| `npm test` | Passed: 27 files, 105 tests across shared, API, web, and architecture suites |
+| `npm run test:integration` | Passed: 4 files, 19 tests against the guarded Atlas `_test` database |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and Next.js routes including `/learn/[slug]` compiled |
+| `npm run test:e2e` | Passed: 12 tests across desktop Chromium and Pixel 7 emulation; learning flow, light/dark themes, no horizontal overflow, and zero axe violations verified |
+| `npm run seed:a1` | Passed idempotently: 0 inserted, 4 updated, 4 matched in the configured development database |
+
+The first Playwright attempt after generating fresh route types encountered a Next.js development-cache warm-up reload on three desktop cases (9 passed, 3 timed out while still showing loading states). An immediate rerun against the stabilized isolated `.next-e2e` cache passed all 12 cases without code changes.
+
+Phase 04 acceptance criteria are fully satisfied. Phase 05 remains not started.

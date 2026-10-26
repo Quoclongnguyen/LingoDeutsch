@@ -67,6 +67,13 @@ describe("Phase 01 model indexes", () => {
     ).toBe(true);
     expect(
       hasIndex(
+        VocabularySetModel.schema.indexes(),
+        { userId: 1, sourceLessonId: 1 },
+        { unique: true },
+      ),
+    ).toBe(true);
+    expect(
+      hasIndex(
         LessonProgressModel.schema.indexes(),
         { userId: 1, lessonId: 1 },
         { unique: true },

@@ -15,6 +15,11 @@ import {
   registerReviewRoutes,
   type ReviewRouteServices,
 } from "@/routes/reviews";
+import {
+  defaultLearningServices,
+  registerLearningRoutes,
+  type LearningRouteServices,
+} from "@/routes/learning";
 import { DuplicateVocabularyWordError } from "@/services/vocabulary/create-vocabulary-word";
 import { VocabularyWordNotFoundError } from "@/services/vocabulary/vocabulary-library";
 import { VocabularySetNotFoundError } from "@/services/vocabulary/vocabulary-sets";
@@ -24,15 +29,22 @@ import {
   ReviewSessionNotFoundError,
   ReviewSessionStateError,
 } from "@/services/review/review-sessions";
+import {
+  LessonNotFoundError,
+  LessonProgressConflictError,
+  LessonVocabularyNotFoundError,
+} from "@/services/learning/learning";
 
 export async function buildApi({
   logger = true,
   internalApiSecret,
+  learningServices,
   reviewServices,
   vocabularyServices,
   webOrigin,
 }: {
   internalApiSecret: string;
+  learningServices?: Partial<LearningRouteServices>;
   logger?: FastifyServerOptions["logger"];
   reviewServices?: Partial<ReviewRouteServices>;
   vocabularyServices?: Partial<VocabularyRouteServices>;
@@ -85,13 +97,16 @@ export async function buildApi({
       error instanceof VocabularyWordNotFoundError ||
       error instanceof VocabularySetNotFoundError ||
       error instanceof VocabularySetOwnershipError ||
-      error instanceof ReviewSessionNotFoundError
+      error instanceof ReviewSessionNotFoundError ||
+      error instanceof LessonNotFoundError ||
+      error instanceof LessonVocabularyNotFoundError
     ) {
       return reply.code(404).send({ error: "not_found" });
     }
     if (
       error instanceof ReviewSessionStateError ||
-      error instanceof ReviewEventConflictError
+      error instanceof ReviewEventConflictError ||
+      error instanceof LessonProgressConflictError
     ) {
       return reply.code(409).send({ error: "review_conflict" });
     }
@@ -107,6 +122,10 @@ export async function buildApi({
   await registerReviewRoutes(api, {
     internalApiSecret,
     services: { ...defaultReviewServices, ...reviewServices },
+  });
+  await registerLearningRoutes(api, {
+    internalApiSecret,
+    services: { ...defaultLearningServices, ...learningServices },
   });
 
   return api;

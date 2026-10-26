@@ -27,6 +27,27 @@ export async function findActiveVocabularyWordByNormalizedHeadword(
     .exec();
 }
 
+export async function attachLessonSourceToVocabularyWord(
+  userId: string,
+  wordId: Types.ObjectId,
+  lessonId: Types.ObjectId,
+  setId: Types.ObjectId,
+  session: ClientSession,
+) {
+  return VocabularyWordModel.findOneAndUpdate(
+    { _id: wordId, isArchived: false, userId: objectId(userId) },
+    [
+      {
+        $set: {
+          setIds: { $setUnion: [{ $ifNull: ["$setIds", []] }, [setId]] },
+          sourceLessonId: { $ifNull: ["$sourceLessonId", lessonId] },
+        },
+      },
+    ],
+    { returnDocument: "after", session, updatePipeline: true },
+  ).exec();
+}
+
 export async function createVocabularyWordRecord(
   userId: string,
   input: ValidatedVocabularyInput,
