@@ -53,3 +53,18 @@ export {
   type LessonProgressInput,
   type LessonVocabularySaveInput,
 } from "./validation/learning";
+export {
+  grammarCompactTableSchema,
+  grammarExampleSchema,
+  grammarRelatedLessonSchema,
+  grammarRuleSchema,
+  grammarTopicContentSchema,
+  grammarTopicDetailSchema,
+  grammarTopicListQuerySchema,
+  grammarTopicListResponseSchema,
+  grammarTopicSummarySchema,
+  type GrammarTopicContent,
+  type GrammarTopicDetail,
+  type GrammarTopicListQuery,
+  type GrammarTopicListResponse,
+} from "./validation/grammar";

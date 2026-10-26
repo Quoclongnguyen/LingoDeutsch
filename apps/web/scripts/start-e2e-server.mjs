@@ -8,6 +8,7 @@ process.argv = [
   process.execPath,
   "next",
   "dev",
+  "--webpack",
   "--hostname",
   "127.0.0.1",
   "--port",

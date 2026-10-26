@@ -1,6 +1,6 @@
 # Phase 05 — Grammar library
 
-**Status:** Not started
+**Status:** Complete
 
 ## Outcome
 

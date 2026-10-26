@@ -145,6 +145,38 @@ describe("Phase 04 learning workspaces", () => {
     );
   });
 
+  it("replays a completed lesson without writing progress backward", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(
+      Response.json({
+        ...lessonRecord,
+        progress: {
+          completedActivityIds: ["vocabulary-introduction"],
+          currentActivityIndex: 1,
+          status: "completed",
+        },
+      }),
+    );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    const { container } = render(
+      <LessonWorkspace replay slug={lessonRecord.slug} />,
+    );
+
+    expect(await screen.findByText("der Name · die Namen")).toBeInTheDocument();
+    expect(
+      container.querySelector(".lesson-progress__segments span"),
+    ).toHaveAttribute("data-complete", "false");
+    await user.click(
+      screen.getByRole("button", { name: "Hoàn thành lượt luyện" }),
+    );
+
+    expect(
+      await screen.findByRole("heading", { name: "Bạn đã luyện lại bài học" }),
+    ).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
   it("renders the real Today due action and next lesson", async () => {
     vi.stubGlobal(
       "fetch",

@@ -20,6 +20,11 @@ import {
   registerLearningRoutes,
   type LearningRouteServices,
 } from "@/routes/learning";
+import {
+  defaultGrammarServices,
+  registerGrammarRoutes,
+  type GrammarRouteServices,
+} from "@/routes/grammar";
 import { DuplicateVocabularyWordError } from "@/services/vocabulary/create-vocabulary-word";
 import { VocabularyWordNotFoundError } from "@/services/vocabulary/vocabulary-library";
 import { VocabularySetNotFoundError } from "@/services/vocabulary/vocabulary-sets";
@@ -34,16 +39,19 @@ import {
   LessonProgressConflictError,
   LessonVocabularyNotFoundError,
 } from "@/services/learning/learning";
+import { GrammarTopicNotFoundError } from "@/services/grammar/grammar";
 
 export async function buildApi({
   logger = true,
   internalApiSecret,
+  grammarServices,
   learningServices,
   reviewServices,
   vocabularyServices,
   webOrigin,
 }: {
   internalApiSecret: string;
+  grammarServices?: Partial<GrammarRouteServices>;
   learningServices?: Partial<LearningRouteServices>;
   logger?: FastifyServerOptions["logger"];
   reviewServices?: Partial<ReviewRouteServices>;
@@ -99,7 +107,8 @@ export async function buildApi({
       error instanceof VocabularySetOwnershipError ||
       error instanceof ReviewSessionNotFoundError ||
       error instanceof LessonNotFoundError ||
-      error instanceof LessonVocabularyNotFoundError
+      error instanceof LessonVocabularyNotFoundError ||
+      error instanceof GrammarTopicNotFoundError
     ) {
       return reply.code(404).send({ error: "not_found" });
     }
@@ -126,6 +135,10 @@ export async function buildApi({
   await registerLearningRoutes(api, {
     internalApiSecret,
     services: { ...defaultLearningServices, ...learningServices },
+  });
+  await registerGrammarRoutes(api, {
+    internalApiSecret,
+    services: { ...defaultGrammarServices, ...grammarServices },
   });
 
   return api;

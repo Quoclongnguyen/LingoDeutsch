@@ -282,3 +282,35 @@ Observed verification:
 | `npm run format:check` | Passed after formatting the new test cases |
 | `npm run build` | Passed for shared, API, and web workspaces |
 | Live BFF smoke check | Passed: `/api/domain/dashboard` and `/api/domain/learning-path?level=A1` returned HTTP 200 with seeded data |
+
+### 2026-10-26 — Phase 05 grammar library complete
+
+Implemented:
+
+- Added strict shared contracts for grammar list/detail queries, structured rules, bilingual examples, and bounded rectangular tables; arbitrary HTML is rejected at the validation boundary.
+- Added the indexed `grammarTopics` MongoDB model, repository/service boundary, authenticated Fastify list/detail routes, and authenticated BFF allowlist entry.
+- Added an idempotent five-topic A1 grammar seed for greetings and register, personal pronouns, `sein`/`haben`, noun articles, and regular present-tense conjugation. The seed stores no Phase 06 answer keys or exercises.
+- Added Learn sub-navigation, responsive grammar list/detail pages, concise German-first content, Vietnamese explanations, compact tables, related-lesson links, and loading/empty/error/not-found/populated states.
+- Added read-only grammar summaries to lesson detail and links from lessons back to grammar without changing the five primary navigation destinations.
+- Added an explicit replay mode for completed lessons. Replay advances only local UI state and never sends a progress mutation, so persisted completion evidence remains unchanged.
+- Switched the isolated E2E development runner to webpack because Turbopack watched its custom `.next-e2e` output and repeatedly refreshed pages on Windows.
+- Kept the unlocked second lesson as seeded path metadata only; complete lesson-two activities remain outside Phase 05 and are not presented as completed content.
+
+Observed verification:
+
+| Check | Result |
+|---|---|
+| Red-green TDD | New contract, model, seed, route, service, proxy, grammar UI, and replay tests failed before implementation and passed after it |
+| Replay mutation check | Inverting the replay guard caused 2 focused tests to fail; restoring the guard passed 1 file, 4 tests |
+| `npm test` | Passed: 33 files, 128 tests across shared, API, web, and architecture suites |
+| `npm run test:integration` | Passed: 5 files, 22 tests against the guarded Atlas `_test` database, including published filtering and idempotent grammar seed coverage |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and Next.js grammar routes compiled |
+| Playwright | Passed: 14 tests across desktop Chromium and Pixel 7 emulation, including grammar list/detail/lesson links, replay without progress writes, no horizontal overflow, and zero axe violations |
+| Development seed | Passed: 5 grammar topics inserted while the existing 4 A1 lessons were updated idempotently |
+| Manual acceptance | User confirmed the first lesson completion and second-lesson unlock flow in the light theme; the second lesson's missing activities were accepted as later-phase content |
+| Five-axis review | Approved after simplifying the replay action label and correcting the progress-segment off-by-one state; no unresolved correctness, architecture, security, or performance findings |
+
+Phase 05 acceptance criteria are fully satisfied. Phase 06 remains not started.
