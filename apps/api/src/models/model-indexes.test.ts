@@ -2,6 +2,7 @@ import type { IndexDefinition, IndexOptions } from "mongoose";
 import { describe, expect, it } from "vitest";
 
 import { LessonProgressModel } from "@/models/lesson-progress";
+import { GrammarTopicModel } from "@/models/grammar-topic";
 import { ReviewLogModel } from "@/models/review-log";
 import { ReviewSessionModel } from "@/models/review-session";
 import { ReviewStateModel } from "@/models/review-state";
@@ -79,5 +80,12 @@ describe("Phase 01 model indexes", () => {
         { unique: true },
       ),
     ).toBe(true);
+  });
+
+  it("defines unique slug and published-list indexes for grammar topics", () => {
+    const indexes = GrammarTopicModel.schema.indexes();
+
+    expect(hasIndex(indexes, { slug: 1 }, { unique: true })).toBe(true);
+    expect(hasIndex(indexes, { level: 1, order: 1, published: 1 })).toBe(true);
   });
 });

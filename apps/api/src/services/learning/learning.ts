@@ -34,6 +34,7 @@ import {
   findActiveVocabularyWordByNormalizedHeadword,
 } from "@/repositories/vocabulary-word-repository";
 import { buildLearningPath } from "./learning-path";
+import { listGrammarTopicsForLesson } from "@/services/grammar/grammar";
 
 export class LessonNotFoundError extends Error {
   constructor() {
@@ -113,9 +114,10 @@ export async function getLesson({
   const lesson = await findPublishedLessonBySlug(slug);
   if (!lesson) throw new LessonNotFoundError();
   const content = lessonContentSchema.parse(lesson.content);
-  const [progress, savedHeadwords] = await Promise.all([
+  const [progress, savedHeadwords, grammarTopics] = await Promise.all([
     findLessonProgressForUser(userId, lesson._id.toString()),
     findSavedHeadwordsForLesson(userId, lesson._id.toString()),
+    listGrammarTopicsForLesson(lesson.slug),
   ]);
   const vocabulary = lesson.vocabularySeed.map((raw) => {
     const item = vocabularySeedItemSchema.parse(raw);
@@ -129,6 +131,7 @@ export async function getLesson({
     content,
     estimatedMinutes: lesson.estimatedMinutes,
     id: lesson._id.toString(),
+    grammarTopics,
     level: lesson.level,
     objectiveVi: lesson.objectiveVi,
     progress: progressOrDefault(progress ?? undefined),
