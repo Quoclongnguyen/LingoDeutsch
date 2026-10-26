@@ -226,7 +226,8 @@ export const A1_GRAMMAR_EXERCISES: Record<string, InternalExercise[]> = {
   "a1-begruessung-und-anrede": [
     {
       correctOptionId: "formal-sie",
-      feedbackCorrectVi: "Đúng: Sie viết hoa dùng cho cách xưng hô trang trọng.",
+      feedbackCorrectVi:
+        "Đúng: Sie viết hoa dùng cho cách xưng hô trang trọng.",
       feedbackIncorrectVi: "Trong tình huống trang trọng, dùng Sie viết hoa.",
       id: "greeting-register",
       instructionVi: "Chọn đại từ xưng hô phù hợp với nhân viên hành chính.",

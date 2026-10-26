@@ -27,7 +27,9 @@ const collections = [
 beforeAll(async () => {
   const database = await connectToDatabase();
   if (!database.connection.name.endsWith("_test")) {
-    throw new Error("Integration tests refused to run outside a _test database.");
+    throw new Error(
+      "Integration tests refused to run outside a _test database.",
+    );
   }
   await Promise.all(collections.map((collection) => collection.syncIndexes()));
 });

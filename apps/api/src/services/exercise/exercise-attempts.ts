@@ -17,10 +17,7 @@ import {
 } from "@/repositories/exercise-attempt-repository";
 import { findPublishedGrammarTopicById } from "@/repositories/grammar-repository";
 import { findPublishedLessonById } from "@/repositories/learning-repository";
-import {
-  gradeExercises,
-  InvalidExerciseAnswersError,
-} from "./grade-exercises";
+import { gradeExercises, InvalidExerciseAnswersError } from "./grade-exercises";
 
 export class ExerciseSourceNotFoundError extends Error {
   constructor() {
@@ -82,7 +79,10 @@ function attemptSummary(attempt: {
   };
 }
 
-function restoredResults(exercises: InternalExercise[], incorrectIds: string[]) {
+function restoredResults(
+  exercises: InternalExercise[],
+  incorrectIds: string[],
+) {
   const incorrect = new Set(incorrectIds);
   return exercises.map((exercise) => {
     const correct = !incorrect.has(exercise.id);
@@ -117,7 +117,10 @@ export async function submitExerciseAttempt({
 }) {
   assertUserId(userId);
   const validated = submitExerciseAttemptSchema.parse(input);
-  const exercises = await loadExercises(validated.sourceType, validated.sourceId);
+  const exercises = await loadExercises(
+    validated.sourceType,
+    validated.sourceId,
+  );
   const existing = await findExerciseAttemptByEventId(validated.attemptEventId);
   if (existing) {
     if (

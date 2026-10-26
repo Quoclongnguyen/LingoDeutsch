@@ -120,16 +120,16 @@ export async function buildApi({
       error instanceof ReviewSessionNotFoundError ||
       error instanceof LessonNotFoundError ||
       error instanceof LessonVocabularyNotFoundError ||
-      error instanceof GrammarTopicNotFoundError
-      || error instanceof ExerciseSourceNotFoundError
+      error instanceof GrammarTopicNotFoundError ||
+      error instanceof ExerciseSourceNotFoundError
     ) {
       return reply.code(404).send({ error: "not_found" });
     }
     if (
       error instanceof ReviewSessionStateError ||
       error instanceof ReviewEventConflictError ||
-      error instanceof LessonProgressConflictError
-      || error instanceof ExerciseAttemptConflictError
+      error instanceof LessonProgressConflictError ||
+      error instanceof ExerciseAttemptConflictError
     ) {
       return reply.code(409).send({ error: "review_conflict" });
     }

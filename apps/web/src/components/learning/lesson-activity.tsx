@@ -1,20 +1,21 @@
 import { BookmarkPlus, Check, MessageSquareText } from "lucide-react";
 
 import type { LessonActivity, LessonVocabulary } from "./types";
+import { ExercisePractice } from "@/components/exercise/exercise-practice";
 
 export function LessonActivityView({
   activity,
   onSaveWord,
-  onSelectAnswer,
+  onExerciseCompletionChange,
+  lessonId,
   savingHeadword,
-  selectedAnswer,
   vocabulary,
 }: {
   activity: LessonActivity;
+  lessonId: string;
   onSaveWord: (headword: string) => Promise<void>;
-  onSelectAnswer: (answer: string) => void;
+  onExerciseCompletionChange: (complete: boolean) => void;
   savingHeadword: string;
-  selectedAnswer: string;
   vocabulary: LessonVocabulary[];
 }) {
   if (activity.type === "dialogue") {
@@ -81,38 +82,15 @@ export function LessonActivityView({
     );
   }
 
-  const isCorrect = selectedAnswer === activity.correctOptionId;
   return (
     <div className="lesson-activity">
-      <h2 lang="de">{activity.questionDe}</h2>
-      <p>{activity.instructionVi}</p>
-      <div className="quiz-options" role="group" aria-label="Các lựa chọn">
-        {activity.options.map((option, index) => (
-          <button
-            key={option.id}
-            type="button"
-            aria-pressed={selectedAnswer === option.id}
-            onClick={() => onSelectAnswer(option.id)}
-          >
-            <span className="grammar-label">{index + 1}</span>
-            <span lang="de">{option.text}</span>
-          </button>
-        ))}
-      </div>
-      {selectedAnswer ? (
-        <p
-          className={
-            isCorrect
-              ? "answer-feedback success-notice"
-              : "answer-feedback form-error"
-          }
-          role="status"
-        >
-          {isCorrect
-            ? activity.feedbackVi
-            : "Chưa đúng. Hãy chú ý cách hỏi lịch sự với Sie."}
-        </p>
-      ) : null}
+      <ExercisePractice
+        exercises={activity.exercises}
+        onCompletionChange={onExerciseCompletionChange}
+        sourceId={lessonId}
+        sourceType="lesson"
+        title={activity.instructionVi}
+      />
     </div>
   );
 }

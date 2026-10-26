@@ -66,13 +66,10 @@ export type LessonActivity =
       type: "vocabulary";
     }
   | {
-      correctOptionId: string;
-      feedbackVi: string;
+      exercises: PublicExercise[];
       id: string;
       instructionVi: string;
-      options: Array<{ id: string; text: string }>;
-      questionDe: string;
-      type: "check";
+      type: "exercise_set";
     };
 
 export type LessonResponse = {
@@ -126,3 +123,4 @@ export type DashboardResponse = {
   }>;
   weeklyGoal: { completed: number; target: number };
 };
+import type { PublicExercise } from "@lingo-deutsch/shared";

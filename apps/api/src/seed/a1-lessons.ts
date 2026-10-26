@@ -257,7 +257,8 @@ export const A1_LESSONS: LessonSeed[] = [
             {
               correctOrder: ["wir", "vereinbaren", "einen", "termin"],
               feedbackCorrectVi: "Đúng: động từ đứng ở vị trí thứ hai.",
-              feedbackIncorrectVi: "Trong câu trần thuật, vereinbaren đứng sau chủ ngữ.",
+              feedbackIncorrectVi:
+                "Trong câu trần thuật, vereinbaren đứng sau chủ ngữ.",
               id: "appointment-order",
               instructionVi: "Sắp xếp thành một câu hoàn chỉnh.",
               tokens: [
@@ -429,8 +430,10 @@ export const A1_LESSONS: LessonSeed[] = [
           exercises: [
             {
               correctOptionId: "mit-karte",
-              feedbackCorrectVi: "Đúng: mit Karte bezahlen là thanh toán bằng thẻ.",
-              feedbackIncorrectVi: "Để hỏi cách thanh toán, dùng mit Karte bezahlen.",
+              feedbackCorrectVi:
+                "Đúng: mit Karte bezahlen là thanh toán bằng thẻ.",
+              feedbackIncorrectVi:
+                "Để hỏi cách thanh toán, dùng mit Karte bezahlen.",
               id: "supermarket-payment",
               instructionVi: "Chọn câu hỏi phù hợp tại quầy thanh toán.",
               options: [
@@ -445,7 +448,8 @@ export const A1_LESSONS: LessonSeed[] = [
               acceptedAnswers: ["kostet"],
               caseSensitive: false,
               feedbackCorrectVi: "Đúng: das đi với kostet.",
-              feedbackIncorrectVi: "Với chủ ngữ das, kosten được chia thành kostet.",
+              feedbackIncorrectVi:
+                "Với chủ ngữ das, kosten được chia thành kostet.",
               id: "supermarket-cost",
               instructionVi: "Điền dạng động từ đúng.",
               promptDe: "Wie viel ___ das?",
@@ -453,8 +457,10 @@ export const A1_LESSONS: LessonSeed[] = [
             },
             {
               correctOrder: ["ich", "haette", "gern", "ein", "brot"],
-              feedbackCorrectVi: "Đúng: Ich hätte gern… là cách yêu cầu lịch sự.",
-              feedbackIncorrectVi: "Bắt đầu bằng Ich hätte gern, sau đó là món cần mua.",
+              feedbackCorrectVi:
+                "Đúng: Ich hätte gern… là cách yêu cầu lịch sự.",
+              feedbackIncorrectVi:
+                "Bắt đầu bằng Ich hätte gern, sau đó là món cần mua.",
               id: "supermarket-order",
               instructionVi: "Sắp xếp thành một yêu cầu lịch sự.",
               tokens: [
@@ -621,7 +627,8 @@ export const A1_LESSONS: LessonSeed[] = [
             {
               correctOptionId: "um-stelle",
               feedbackCorrectVi: "Đúng: sich bewerben um đi với Akkusativ.",
-              feedbackIncorrectVi: "Động từ sich bewerben dùng giới từ um + Akkusativ.",
+              feedbackIncorrectVi:
+                "Động từ sich bewerben dùng giới từ um + Akkusativ.",
               id: "occupation-preposition",
               instructionVi: "Chọn cụm đúng.",
               options: [
@@ -635,7 +642,8 @@ export const A1_LESSONS: LessonSeed[] = [
             {
               acceptedAnswers: ["arbeite"],
               caseSensitive: false,
-              feedbackCorrectVi: "Đúng: với ich, arbeiten được chia thành arbeite.",
+              feedbackCorrectVi:
+                "Đúng: với ich, arbeiten được chia thành arbeite.",
               feedbackIncorrectVi: "Với chủ ngữ ich, thêm đuôi -e: arbeite.",
               id: "occupation-verb",
               instructionVi: "Điền dạng động từ đúng.",
@@ -644,8 +652,10 @@ export const A1_LESSONS: LessonSeed[] = [
             },
             {
               correctOrder: ["ich", "bewerbe", "mich", "um", "eine", "stelle"],
-              feedbackCorrectVi: "Đúng: đại từ phản thân mich đứng sau động từ.",
-              feedbackIncorrectVi: "Dùng cấu trúc Ich bewerbe mich um eine Stelle.",
+              feedbackCorrectVi:
+                "Đúng: đại từ phản thân mich đứng sau động từ.",
+              feedbackIncorrectVi:
+                "Dùng cấu trúc Ich bewerbe mich um eine Stelle.",
               id: "occupation-order",
               instructionVi: "Sắp xếp câu ứng tuyển.",
               tokens: [

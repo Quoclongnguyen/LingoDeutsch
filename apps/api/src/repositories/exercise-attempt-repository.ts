@@ -4,7 +4,8 @@ import type { ExerciseSourceType } from "@lingo-deutsch/shared";
 import { ExerciseAttemptModel } from "@/models/exercise-attempt";
 
 function objectId(value: string) {
-  if (!Types.ObjectId.isValid(value)) throw new Error("A valid ObjectId is required.");
+  if (!Types.ObjectId.isValid(value))
+    throw new Error("A valid ObjectId is required.");
   return new Types.ObjectId(value);
 }
 

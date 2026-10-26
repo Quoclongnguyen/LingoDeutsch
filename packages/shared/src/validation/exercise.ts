@@ -155,23 +155,8 @@ export const exerciseAttemptListQuerySchema = z.object({
   sourceType: z.enum(exerciseSourceTypes),
 });
 
-export function toPublicExercise(
-  exercise: InternalExercise,
-): PublicExercise {
-  if (exercise.type === "multiple_choice") {
-    const { correctOptionId: _answer, ...publicExercise } = exercise;
-    return publicExercise;
-  }
-  if (exercise.type === "fill_blank") {
-    const {
-      acceptedAnswers: _answers,
-      caseSensitive: _caseSensitive,
-      ...publicExercise
-    } = exercise;
-    return publicExercise;
-  }
-  const { correctOrder: _answer, ...publicExercise } = exercise;
-  return publicExercise;
+export function toPublicExercise(exercise: InternalExercise): PublicExercise {
+  return publicExerciseSchema.parse(exercise);
 }
 
 export type ExerciseAnswer = z.output<typeof exerciseAnswerSchema>;

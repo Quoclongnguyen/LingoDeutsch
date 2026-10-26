@@ -1,7 +1,4 @@
-import type {
-  ExerciseAnswer,
-  InternalExercise,
-} from "@lingo-deutsch/shared";
+import type { ExerciseAnswer, InternalExercise } from "@lingo-deutsch/shared";
 
 export class InvalidExerciseAnswersError extends Error {
   constructor(message: string) {
@@ -30,7 +27,10 @@ function isCorrect(exercise: InternalExercise, answer: ExerciseAnswer) {
         `Answer type does not match exercise ${exercise.id}.`,
       );
     }
-    const submitted = normalizeFillAnswer(answer.answer, exercise.caseSensitive);
+    const submitted = normalizeFillAnswer(
+      answer.answer,
+      exercise.caseSensitive,
+    );
     return exercise.acceptedAnswers.some(
       (accepted) =>
         normalizeFillAnswer(accepted, exercise.caseSensitive) === submitted,
@@ -43,7 +43,9 @@ function isCorrect(exercise: InternalExercise, answer: ExerciseAnswer) {
   }
   return (
     answer.answer.length === exercise.correctOrder.length &&
-    answer.answer.every((tokenId, index) => tokenId === exercise.correctOrder[index])
+    answer.answer.every(
+      (tokenId, index) => tokenId === exercise.correctOrder[index],
+    )
   );
 }
 
@@ -63,7 +65,8 @@ export function gradeExercises(
   if (
     answersByExercise.size !== exercises.length ||
     answers.some(
-      (answer) => !exercises.some((exercise) => exercise.id === answer.exerciseId),
+      (answer) =>
+        !exercises.some((exercise) => exercise.id === answer.exerciseId),
     )
   ) {
     throw new InvalidExerciseAnswersError(

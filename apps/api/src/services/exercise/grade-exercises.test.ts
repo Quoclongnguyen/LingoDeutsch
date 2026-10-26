@@ -69,13 +69,16 @@ describe("gradeExercises", () => {
   });
 
   it("preserves umlauts and ß as meaningful German spelling", () => {
-    const result = gradeExercises([exercises[1]!], [
-      {
-        answer: "heissen",
-        exerciseId: "fill-heissen",
-        type: "fill_blank",
-      },
-    ]);
+    const result = gradeExercises(
+      [exercises[1]!],
+      [
+        {
+          answer: "heissen",
+          exerciseId: "fill-heissen",
+          type: "fill_blank",
+        },
+      ],
+    );
 
     expect(result.score).toBe(0);
     expect(result.results[0]).toMatchObject({
@@ -87,36 +90,45 @@ describe("gradeExercises", () => {
   it("rejects missing, duplicate, unknown, and mismatched answers", () => {
     expect(() => gradeExercises(exercises, [])).toThrow(/one answer/i);
     expect(() =>
-      gradeExercises([exercises[0]!], [
-        {
-          answer: "formal",
-          exerciseId: "formal-address",
-          type: "multiple_choice",
-        },
-        {
-          answer: "formal",
-          exerciseId: "formal-address",
-          type: "multiple_choice",
-        },
-      ]),
+      gradeExercises(
+        [exercises[0]!],
+        [
+          {
+            answer: "formal",
+            exerciseId: "formal-address",
+            type: "multiple_choice",
+          },
+          {
+            answer: "formal",
+            exerciseId: "formal-address",
+            type: "multiple_choice",
+          },
+        ],
+      ),
     ).toThrow(/one answer/i);
     expect(() =>
-      gradeExercises([exercises[0]!], [
-        {
-          answer: "formal",
-          exerciseId: "unknown",
-          type: "multiple_choice",
-        },
-      ]),
+      gradeExercises(
+        [exercises[0]!],
+        [
+          {
+            answer: "formal",
+            exerciseId: "unknown",
+            type: "multiple_choice",
+          },
+        ],
+      ),
     ).toThrow(/one answer/i);
     expect(() =>
-      gradeExercises([exercises[0]!], [
-        {
-          answer: "formal",
-          exerciseId: "formal-address",
-          type: "fill_blank",
-        },
-      ]),
+      gradeExercises(
+        [exercises[0]!],
+        [
+          {
+            answer: "formal",
+            exerciseId: "formal-address",
+            type: "fill_blank",
+          },
+        ],
+      ),
     ).toThrow(/type/i);
   });
 });

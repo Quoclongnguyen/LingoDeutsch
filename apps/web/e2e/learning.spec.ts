@@ -45,19 +45,26 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
           type: "vocabulary",
         },
         {
-          correctOptionId: "formal-introduction",
-          feedbackVi: "Đúng. Đây là cách giới thiệu lịch sự.",
-          id: "check-introduction",
-          instructionVi: "Chọn câu phù hợp.",
-          options: [
+          exercises: [
             {
+              feedbackCorrectVi: "Đúng. Đây là cách giới thiệu lịch sự.",
+              feedbackIncorrectVi: "Hãy dùng Guten Tag và Sie.",
               id: "formal-introduction",
-              text: "Guten Tag. Ich heiße Long. Wie heißen Sie?",
+              instructionVi: "Chọn câu phù hợp.",
+              options: [
+                {
+                  id: "formal-introduction",
+                  text: "Guten Tag. Ich heiße Long. Wie heißen Sie?",
+                },
+                { id: "farewell", text: "Auf Wiedersehen." },
+              ],
+              promptDe: "Wie stellen Sie sich höflich vor?",
+              type: "multiple_choice",
             },
-            { id: "farewell", text: "Auf Wiedersehen." },
           ],
-          questionDe: "Wie stellen Sie sich höflich vor?",
-          type: "check",
+          id: "practice-introduction",
+          instructionVi: "Luyện cách giới thiệu lịch sự.",
+          type: "exercise_set",
         },
       ],
     },
@@ -155,6 +162,22 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
       lesson.progress = request.postDataJSON();
       return route.fulfill({ json: lesson.progress });
     }
+    if (url.pathname.endsWith("/exercise-attempts")) {
+      return route.fulfill({
+        json: {
+          attempt: { score: 1, total: 1 },
+          idempotent: false,
+          results: [
+            {
+              correct: true,
+              exerciseId: "formal-introduction",
+              feedbackVi: "Đúng. Đây là cách giới thiệu lịch sự.",
+              type: "multiple_choice",
+            },
+          ],
+        },
+      });
+    }
     return route.fulfill({ json: { error: "not_found" }, status: 404 });
   });
 
@@ -182,6 +205,10 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
       name: /Guten Tag. Ich heiße Long. Wie heißen Sie?/i,
     })
     .click();
+  await page.getByRole("button", { name: "Nộp bài" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Kết quả 1/1" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Hoàn thành bài học" }).click();
   await expect(
     page.getByRole("heading", { name: "Bạn đã hoàn thành bài học" }),
@@ -197,6 +224,10 @@ test("learner follows the A1 path, saves a word, and completes a lesson", async 
       name: /Guten Tag. Ich heiße Long. Wie heißen Sie?/i,
     })
     .click();
+  await page.getByRole("button", { name: "Nộp bài" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Kết quả 1/1" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Hoàn thành lượt luyện" }).click();
   await expect(
     page.getByRole("heading", { name: "Bạn đã luyện lại bài học" }),

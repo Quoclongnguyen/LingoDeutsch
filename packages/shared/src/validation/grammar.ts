@@ -102,7 +102,9 @@ export const grammarTopicDetailSchema = grammarTopicContentSchema
   });
 
 export type GrammarTopicContent = z.output<typeof grammarTopicContentSchema>;
-export type GrammarTopicContentInput = z.input<typeof grammarTopicContentSchema>;
+export type GrammarTopicContentInput = z.input<
+  typeof grammarTopicContentSchema
+>;
 export type GrammarTopicDetail = z.output<typeof grammarTopicDetailSchema>;
 export type GrammarTopicListQuery = z.output<
   typeof grammarTopicListQuerySchema
