@@ -11,8 +11,10 @@ This file records observed implementation progress and verification evidence. Pl
 | 01.5 — Frontend/backend workspace split | Complete | Web, API, and shared workspaces verified locally and against the isolated Atlas test database; production seed counts preserved |
 | 02 — Vocabulary library | Complete | Authenticated BFF, user-scoped vocabulary API, responsive CRUD/search/sets/import UI, and all Phase 02 checks passed |
 | 03 — SRS vertical slice | Complete | Deterministic scheduler, tenant-safe due queue, transactional/idempotent rating, recoverable session UI, and all finish gates verified |
-| 04 — Today and A1 learning path | Not started | — |
-| 05 — Hardening and preview deployment | Not started | — |
+| 04 — Today and A1 learning path | Complete | Data-backed dashboard and A1 path, progress/prerequisite enforcement, lesson player, save-word flow, and verified responsive UI |
+| 05 — Grammar library | Complete | Five structured A1 topics, grammar/lesson links, safe replay, Atlas seed, and all finish gates verified |
+| 06 — Exercise engine | Complete | Three server-graded exercise types, private answer keys, idempotent user-owned attempts, populated lessons, accessible practice UI, and all finish gates verified |
+| 07 — Integration, QA, and preview | Not started | — |
 
 ## Activity
 
@@ -314,3 +316,34 @@ Observed verification:
 | Five-axis review | Approved after simplifying the replay action label and correcting the progress-segment off-by-one state; no unresolved correctness, architecture, security, or performance findings |
 
 Phase 05 acceptance criteria are fully satisfied. Phase 06 remains not started.
+
+### 2026-10-26 — Phase 06 exercise engine complete
+
+Implemented:
+
+- Added strict shared discriminated unions for exactly `multiple_choice`, `fill_blank`, and `word_ordering`, with separate internal and public DTOs so lesson and grammar reads never serialize answer keys.
+- Added deterministic server graders. Fill-in normalization trims/collapses whitespace and applies approved German case behavior while preserving umlauts and `ß`.
+- Added authenticated Fastify submit/history routes, a BFF allowlist entry, a Mongoose attempt model, the required unique/history indexes, bounded user-scoped history, and idempotent conflict-safe persistence. Raw submitted answers are not persisted.
+- Added lesson and grammar exercise sources, populated all three previously empty A1 lessons, and seeded practice for all five A1 grammar topics without changing vocabulary SRS state.
+- Added a responsive practice flow with one decision per screen, all three interaction types, keyboard/click word ordering, accessible live order announcements, submitting/error/recovery states, per-question icon/text feedback, exact score/total, and retry with a new event ID.
+- Gated lesson progress on a successful server grading response and added standalone practice entry points from grammar details.
+- Seeded the configured development Atlas database idempotently: 4 lessons and 5 grammar topics updated and matched without duplicate inserts.
+- Five-axis review found and fixed stale source content during same-route navigation and a misleading `review_conflict` API code for exercise event conflicts. Both fixes have regression tests; no required correctness, architecture, security, performance, or accessibility findings remain.
+- Mutation-checked multiple-choice grading: inverting the answer comparison made the focused test fail with score 2 instead of 3; restoring the comparison returned all 3 grader tests to green.
+
+Observed final verification:
+
+| Command | Result |
+|---|---|
+| `npm test` | Passed: 38 files, 146 tests across shared, API, web, and architecture suites |
+| `npm run test:integration` | Passed: 6 files, 25 tests against the guarded Atlas `_test` database, including answer-key privacy, idempotency, ownership, bounded history, indexes, and no SRS mutation |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and Next.js routes including `/practice/exercises/[sourceType]/[slug]` compiled |
+| `npm run test:e2e` | Passed: 16 tests across desktop Chromium and mobile Chromium; the exercise flow was explicitly verified at 375px, in light/dark themes, with keyboard operation, no horizontal overflow, and zero axe violations |
+| `npm run seed:a1` | Passed idempotently: lessons 0 inserted/4 updated/4 matched; grammar topics 0 inserted/5 updated/5 matched |
+
+One intermediate E2E run completed all 16 browser tests but Windows denied the sandboxed cleanup `taskkill`; the follow-up run outside that restriction exited successfully and a read-only port check confirmed no listener remained on port 3100.
+
+Phase 06 acceptance criteria are fully satisfied. Phase 07 is the next planned phase and remains not started. Deployment remains separately authorized.
