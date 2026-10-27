@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { readDomainJson } from "@/components/learning/read-domain-json";
+import { readDomainJson } from "@/lib/api/read-domain-json";
 
 type DomainResourceState<T> = {
   data?: T;

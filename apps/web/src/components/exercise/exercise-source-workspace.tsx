@@ -10,7 +10,7 @@ import type {
   PublicExercise,
 } from "@lingo-deutsch/shared";
 import { ExercisePractice } from "./exercise-practice";
-import { readDomainJson } from "@/components/learning/read-domain-json";
+import { readDomainJson } from "@/lib/api/read-domain-json";
 import type { LessonResponse } from "@/components/learning/types";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";

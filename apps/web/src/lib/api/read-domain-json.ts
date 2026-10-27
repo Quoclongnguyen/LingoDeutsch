@@ -1,4 +1,9 @@
-export async function readDomainJson<T>(response: Response): Promise<T> {
+const defaultErrorMessage = "Không thể tải dữ liệu học tập.";
+
+export async function readDomainJson<T>(
+  response: Response,
+  fallbackMessage = defaultErrorMessage,
+): Promise<T> {
   const body = await response.text();
   let data: unknown;
   if (body) {
@@ -16,7 +21,7 @@ export async function readDomainJson<T>(response: Response): Promise<T> {
       "message" in data &&
       typeof data.message === "string"
         ? data.message
-        : "Không thể tải dữ liệu học tập.";
+        : fallbackMessage;
     throw new Error(message);
   }
   if (data === undefined) {

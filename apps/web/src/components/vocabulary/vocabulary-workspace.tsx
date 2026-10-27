@@ -13,6 +13,7 @@ import type {
 import { VocabularySetsView } from "@/components/vocabulary/vocabulary-sets-view";
 import { VocabularyTable } from "@/components/vocabulary/vocabulary-table";
 import { WordFormDialog } from "@/components/vocabulary/word-form-dialog";
+import { readDomainJson } from "@/lib/api/read-domain-json";
 
 type Tab = "due" | "library" | "sets";
 type Filters = {
@@ -27,13 +28,6 @@ const emptyData: VocabularyListResponse = {
   pagination: { page: 1, pageSize: 20, total: 0, totalPages: 1 },
   summary: { due: 0, learning: 0, mastered: 0, total: 0 },
 };
-
-async function readJson<T>(response: Response): Promise<T> {
-  const data = (await response.json()) as T & { message?: string };
-  if (!response.ok)
-    throw new Error(data.message ?? "Máy chủ chưa thể xử lý yêu cầu.");
-  return data;
-}
 
 export function VocabularyWorkspace() {
   const [tab, setTab] = useState<Tab>("library");
@@ -57,8 +51,9 @@ export function VocabularyWorkspace() {
   const [importing, setImporting] = useState(false);
 
   const loadSets = useCallback(async () => {
-    const result = await readJson<{ items: VocabularySet[] }>(
+    const result = await readDomainJson<{ items: VocabularySet[] }>(
       await fetch("/api/domain/vocabulary-sets", { cache: "no-store" }),
+      "Máy chủ chưa thể xử lý yêu cầu.",
     );
     setSets(result.items);
   }, []);
@@ -75,10 +70,11 @@ export function VocabularyWorkspace() {
         if (value) params.set(key, value);
       if (tab === "due") params.set("due", "true");
       setData(
-        await readJson<VocabularyListResponse>(
+        await readDomainJson<VocabularyListResponse>(
           await fetch(`/api/domain/vocabulary?${params}`, {
             cache: "no-store",
           }),
+          "Máy chủ chưa thể xử lý yêu cầu.",
         ),
       );
     } catch (caught) {
@@ -115,12 +111,13 @@ export function VocabularyWorkspace() {
 
   async function saveWord(payload: Record<string, unknown>) {
     const editing = editingWord ?? undefined;
-    await readJson(
+    await readDomainJson(
       await fetch(`/api/domain/vocabulary${editing ? `/${editing.id}` : ""}`, {
         body: JSON.stringify(payload),
         headers: { "content-type": "application/json" },
         method: editing ? "PATCH" : "POST",
       }),
+      "Máy chủ chưa thể xử lý yêu cầu.",
     );
     setEditingWord(undefined);
     setNotice(editing ? "Đã cập nhật từ." : "Đã thêm từ vào kho.");

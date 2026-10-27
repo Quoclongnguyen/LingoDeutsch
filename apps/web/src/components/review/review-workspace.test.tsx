@@ -124,4 +124,20 @@ describe("ReviewWorkspace", () => {
       expect(screen.getByRole("heading", { name: "Termin" })).toBeVisible(),
     );
   });
+
+  it("shows a stable error when starting a review returns an empty failure", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response(null, { status: 503 })),
+    );
+
+    render(<ReviewWorkspace />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Máy chủ chưa thể xử lý lượt ôn.",
+    );
+    expect(
+      screen.queryByText(/Unexpected end of JSON input/i),
+    ).not.toBeInTheDocument();
+  });
 });

@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { LessonActivityView } from "./lesson-activity";
 import { LessonComplete } from "./lesson-complete";
-import { readDomainJson } from "./read-domain-json";
+import { readDomainJson } from "@/lib/api/read-domain-json";
 import type { LessonResponse } from "./types";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
