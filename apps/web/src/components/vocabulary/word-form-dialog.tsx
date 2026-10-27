@@ -1,8 +1,9 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
+import { useModalDialog } from "@/components/dialog/use-modal-dialog";
 import type {
   VocabularySet,
   VocabularyWord,
@@ -37,6 +38,11 @@ export function WordFormDialog({
   );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { dialogRef, onKeyDown } = useModalDialog({
+    initialFocusRef: inputRef,
+    onClose,
+  });
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -85,6 +91,9 @@ export function WordFormDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="word-dialog-title"
+        onKeyDown={onKeyDown}
+        ref={dialogRef}
+        tabIndex={-1}
       >
         <header className="dialog-heading">
           <div>
@@ -107,10 +116,10 @@ export function WordFormDialog({
             <label className="field field--wide">
               Từ tiếng Đức
               <input
+                ref={inputRef}
                 name="headword"
                 defaultValue={word?.headword}
                 required
-                autoFocus
                 lang="de"
               />
             </label>

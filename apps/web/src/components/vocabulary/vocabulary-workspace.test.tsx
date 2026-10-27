@@ -120,6 +120,27 @@ describe("VocabularyWorkspace", () => {
     expect(within(dialog).getByLabelText("Loại từ")).toBeInTheDocument();
   });
 
+  it("closes the word dialog with Escape and restores focus to its trigger", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json(populatedResponse)),
+    );
+    const user = userEvent.setup();
+
+    render(<VocabularyWorkspace />);
+    await screen.findByRole("heading", { name: "Termin" });
+    const trigger = screen.getByRole("button", { name: "Thêm từ" });
+    await user.click(trigger);
+
+    expect(screen.getByLabelText("Từ tiếng Đức")).toHaveFocus();
+    await user.keyboard("{Escape}");
+
+    expect(
+      screen.queryByRole("dialog", { name: "Thêm từ mới" }),
+    ).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
   it("shows a stable error when the vocabulary response has no JSON body", async () => {
     vi.stubGlobal(
       "fetch",

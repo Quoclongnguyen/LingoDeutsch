@@ -7,6 +7,27 @@ import { ImportDialog } from "./import-dialog";
 afterEach(() => vi.unstubAllGlobals());
 
 describe("ImportDialog", () => {
+  it("keeps keyboard focus inside the dialog and closes with Escape", async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+
+    render(<ImportDialog onClose={onClose} onImported={vi.fn()} />);
+
+    const input = screen.getByLabelText("Dữ liệu từ vựng");
+    const close = screen.getByRole("button", { name: "Đóng" });
+    const cancel = screen.getByRole("button", { name: "Hủy" });
+    expect(input).toHaveFocus();
+
+    close.focus();
+    await user.tab({ shift: true });
+    expect(cancel).toHaveFocus();
+    await user.tab();
+    expect(close).toHaveFocus();
+
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
   it("shows a stable error when import preview returns an empty failure", async () => {
     vi.stubGlobal(
       "fetch",

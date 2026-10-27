@@ -426,3 +426,31 @@ Observed verification:
 | Secret/dependency review | No dependency, environment variable, credential, database, or deployment change |
 
 Phase 07 remains in progress pending the learner's deferred manual primary-loop review. Preview deployment remains separately authorized and was not performed.
+
+### 2026-10-27 — Phase 07 accessible vocabulary dialogs
+
+Implemented:
+
+- Added a shared modal-dialog focus boundary for the vocabulary word form and bulk-import flow without adding a dependency.
+- Focus now moves to the primary input when either dialog opens, wraps within the dialog for forward and reverse Tab navigation, closes with Escape, and returns to the element that opened it.
+- Added component regression coverage for initial focus, reverse focus wrapping, Escape dismissal, and trigger-focus restoration.
+- Extended the browser vocabulary journey to verify the keyboard dismissal and restoration behavior before completing the existing add-and-search flow.
+- Reviewed the existing desktop/mobile light and dark screenshots. The application shell and vocabulary layout remained legible with no product-level horizontal overflow; no visual token or layout change was required.
+- Completed the five-axis review. The behavior is isolated in the shared dialog component boundary, does not alter data access or trust boundaries, performs only bounded queries inside the mounted dialog, and introduced no dependency or secret change.
+- Mutation-checked the Escape branch: changing the handled key to Enter made both focused regression tests fail; restoring Escape returned all 8 focused tests to green.
+
+Observed verification:
+
+| Command or check | Result |
+|---|---|
+| Focused TDD suite | The two keyboard-access tests failed before implementation, then passed: 2 files, 8 tests |
+| Mutation check | Expected failure: 2 tests failed when Escape handling was deliberately changed to Enter; restored suite passed 8/8 |
+| `npm test` | Passed: 44 files, 171 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed after formatting the new dialog hook and updated browser test |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and all Next.js routes compiled |
+| `npm run test:e2e` | Passed: 18 tests across desktop Chromium and mobile Chromium, including the vocabulary keyboard regression |
+| Secret/dependency review | No dependency, API, database, environment variable, credential, or deployment change |
+
+Phase 07 remains in progress pending the learner's deferred manual primary-loop review. Preview deployment remains separately authorized and was not performed.

@@ -94,7 +94,14 @@ test("learner can add and search the responsive vocabulary library", async ({
   await page.goto("/vocabulary");
   await expect(page.getByRole("heading", { name: "Termin" })).toBeVisible();
 
-  await page.getByRole("button", { name: "Thêm từ" }).click();
+  const addWord = page.getByRole("button", { name: "Thêm từ" });
+  await addWord.click();
+  await expect(page.getByLabel("Từ tiếng Đức")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Thêm từ mới" })).toBeHidden();
+  await expect(addWord).toBeFocused();
+
+  await addWord.click();
   await page.getByLabel("Từ tiếng Đức").fill("Arbeit");
   await page.getByLabel("Nghĩa tiếng Việt").fill("công việc");
   await page.getByLabel("Mạo từ").selectOption("die");
