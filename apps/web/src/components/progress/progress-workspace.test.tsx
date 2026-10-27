@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ProgressWorkspace } from "./progress-workspace";
@@ -194,5 +195,29 @@ describe("ProgressWorkspace", () => {
     expect(
       screen.getByText(/Dịch vụ học tập đang tạm thời không phản hồi/),
     ).toBeInTheDocument();
+  });
+
+  it("retries progress loading without reloading the page", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { message: "Dịch vụ học tập đang tạm thời không phản hồi." },
+          { status: 503 },
+        ),
+      )
+      .mockResolvedValueOnce(Response.json(populatedProgress));
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<ProgressWorkspace />);
+
+    const retry = await screen.findByRole("button", { name: "Thử lại" });
+    await user.click(retry);
+
+    expect(
+      await screen.findByRole("heading", { name: "Tiến độ", level: 1 }),
+    ).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
 });

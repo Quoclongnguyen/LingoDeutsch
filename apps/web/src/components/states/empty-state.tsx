@@ -5,15 +5,21 @@ export function EmptyState({
   action,
   description,
   icon: Icon = BookOpenText,
+  role,
   title,
 }: {
   action?: ReactNode;
   description: string;
   icon?: LucideIcon;
+  role?: "alert" | "status";
   title: string;
 }) {
   return (
-    <section className="empty-state" aria-labelledby="empty-state-title">
+    <section
+      className="empty-state"
+      aria-labelledby="empty-state-title"
+      role={role}
+    >
       <span className="empty-state__icon" aria-hidden="true">
         <Icon size={24} strokeWidth={1.7} />
       </span>

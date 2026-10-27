@@ -378,3 +378,27 @@ Observed verification:
 | Secret/generated-file review | `.env.local` remains ignored and untracked; no generated cache, API bundle, Playwright artifact, or credential is included in the intended change set |
 
 The first Playwright run passed all 18 browser cases but Windows denied its sandboxed cleanup command; the approved follow-up exited successfully. Phase 07 remains in progress until the learner completes the deferred manual primary-loop review and any separately authorized preview decision is made.
+
+### 2026-10-27 — Phase 07 recoverable read states
+
+Implemented:
+
+- Added a shared, race-safe domain-resource hook for loading authenticated BFF resources and retrying failed requests without a full page reload.
+- Added a reusable accessible error state with a visible `Thử lại` action and `role="alert"` while preserving the existing Sea Glass button system and optional safe back navigation.
+- Applied in-place retry behavior to Today, the A1 learning path, lesson loading, the grammar library, grammar topic details, and Progress. Exercise-source loading already had equivalent retry behavior and was left unchanged.
+- Separated lesson-load failures from word-save and progress-write failures. A failed action now remains inline inside the active lesson instead of incorrectly replacing the lesson with a full-page load error.
+- Added component coverage proving a `503` response can recover on the next request for all affected read screens, and proving a failed word save keeps the lesson visible.
+
+Observed verification:
+
+| Command | Result |
+|---|---|
+| Focused TDD suite | Five retry tests and two lesson recovery tests failed before implementation, then passed: 3 files, 18 tests |
+| `npm test` | Passed: 43 files, 165 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings after restructuring the hook to avoid synchronous state updates from an effect |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; all existing API and Next.js application routes compiled |
+| `npm run test:e2e:run` | Passed: 18 tests across desktop Chromium and mobile Chromium against the active isolated test server |
+
+Phase 07 remains in progress pending the learner's deferred manual primary-loop review and any separately authorized preview decision.

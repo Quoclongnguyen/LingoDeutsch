@@ -2,11 +2,11 @@
 
 import { ChartNoAxesColumnIncreasing } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import { readDomainJson } from "@/components/learning/read-domain-json";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
+import { RetryableErrorState } from "@/components/states/retryable-error-state";
+import { useDomainResource } from "@/components/states/use-domain-resource";
 import { ActivityTimeline } from "./activity-timeline";
 import {
   CompletedOutcomes,
@@ -17,38 +17,27 @@ import {
 import type { ProgressResponse } from "./types";
 
 export function ProgressWorkspace() {
-  const [progress, setProgress] = useState<ProgressResponse>();
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    void fetch("/api/domain/progress", { cache: "no-store" })
-      .then(readDomainJson<ProgressResponse>)
-      .then((result) => active && setProgress(result))
-      .catch(
-        (caught: unknown) =>
-          active &&
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Không thể tải dữ liệu tiến độ.",
-          ),
-      );
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    data: progress,
+    error,
+    loading,
+    retry,
+  } = useDomainResource<ProgressResponse>(
+    "/api/domain/progress",
+    "Không thể tải dữ liệu tiến độ.",
+  );
 
   if (error) {
     return (
-      <EmptyState
+      <RetryableErrorState
         icon={ChartNoAxesColumnIncreasing}
         title="Chưa thể tải tiến độ"
-        description={`${error} Hãy tải lại trang để thử lại.`}
+        description={`${error} Bạn có thể thử kết nối lại ngay.`}
+        onRetry={retry}
       />
     );
   }
-  if (!progress) return <LoadingSkeleton />;
+  if (loading || !progress) return <LoadingSkeleton />;
 
   const hasEvidence =
     progress.learning.completedLessons > 0 ||

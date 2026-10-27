@@ -2,46 +2,32 @@
 
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import type { GrammarTopicDetail } from "@lingo-deutsch/shared";
 import { LearnSectionNavigation } from "@/components/learning/learn-section-navigation";
-import { readDomainJson } from "@/components/learning/read-domain-json";
-import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
+import { RetryableErrorState } from "@/components/states/retryable-error-state";
+import { useDomainResource } from "@/components/states/use-domain-resource";
 
 export function GrammarTopicWorkspace({ slug }: { slug: string }) {
-  const [topic, setTopic] = useState<GrammarTopicDetail>();
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    void fetch(`/api/domain/grammar-topics/${encodeURIComponent(slug)}`, {
-      cache: "no-store",
-    })
-      .then(readDomainJson<GrammarTopicDetail>)
-      .then((result) => active && setTopic(result))
-      .catch(
-        (caught: unknown) =>
-          active &&
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Không thể tải chủ đề ngữ pháp.",
-          ),
-      );
-    return () => {
-      active = false;
-    };
-  }, [slug]);
+  const {
+    data: topic,
+    error,
+    loading,
+    retry,
+  } = useDomainResource<GrammarTopicDetail>(
+    `/api/domain/grammar-topics/${encodeURIComponent(slug)}`,
+    "Không thể tải chủ đề ngữ pháp.",
+  );
 
   if (error) {
     return (
-      <EmptyState
+      <RetryableErrorState
         icon={BookOpen}
-        title="Không tìm thấy chủ đề ngữ pháp"
-        description={`${error} Hãy quay lại thư viện và chọn một chủ đề khác.`}
-        action={
+        title="Chưa thể tải chủ đề ngữ pháp"
+        description={`${error} Bạn có thể thử lại hoặc quay về thư viện.`}
+        onRetry={retry}
+        secondaryAction={
           <Link className="button button--secondary" href="/learn/grammar">
             Quay lại thư viện
           </Link>
@@ -49,7 +35,7 @@ export function GrammarTopicWorkspace({ slug }: { slug: string }) {
       />
     );
   }
-  if (!topic) return <LoadingSkeleton />;
+  if (loading || !topic) return <LoadingSkeleton />;
   const exercises = topic.exercises ?? [];
 
   return (
