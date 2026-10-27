@@ -1,4 +1,5 @@
 import { AlertTriangle, CalendarClock, RotateCcw } from "lucide-react";
+import Link from "next/link";
 
 import type { ReviewSession } from "@/components/review/types";
 
@@ -95,6 +96,9 @@ export function ReviewComplete({ session }: { session: ReviewSession }) {
       <p>
         Lượt ôn gần nhất tiếp theo: {dateLabel(session.summary?.nextDueAt)}.
       </p>
+      <Link className="button button--primary" href="/progress">
+        Xem tiến độ
+      </Link>
     </section>
   );
 }

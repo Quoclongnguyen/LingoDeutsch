@@ -347,3 +347,34 @@ Observed final verification:
 One intermediate E2E run completed all 16 browser tests but Windows denied the sandboxed cleanup `taskkill`; the follow-up run outside that restriction exited successfully and a read-only port check confirmed no listener remained on port 3100.
 
 Phase 06 acceptance criteria are fully satisfied. Phase 07 is the next planned phase and remains not started. Deployment remains separately authorized.
+
+### 2026-10-27 — Phase 07 integration, QA, and preview preparation in progress
+
+Implemented:
+
+- Updated the Today milestone to aggregate the complete four-lesson A1 path rather than only the first module.
+- Added an authenticated, user-scoped `GET /api/v1/progress` aggregation for lesson completion, vocabulary/SRS evidence, exercise results, completed outcomes, and a seven-day activity timeline.
+- Added the progress BFF allowlist entry and a responsive Progress workspace with loading, evidence-free, upstream-error, populated, light/dark, and 375px mobile states. The copy explicitly avoids claiming CEFR certification or unsupported mastery.
+- Replaced the Practice placeholder with working routes to SRS review, A1 lesson practice, and grammar practice; linked a completed review session to Progress.
+- Added query-supporting user/date indexes without creating a new collection or changing SRS scheduling behavior.
+- Added a preview-readiness checklist covering environment variable names, MongoDB isolation, seed policy, security/build gates, health checks, rollback, and evidence capture. No deployment or external infrastructure mutation was performed.
+- Completed a five-axis review of correctness, maintainability, architecture, performance, and security. Ownership remains derived from the trusted BFF boundary; every personal aggregation is filtered by `userId`; returned lists are bounded; no unresolved high-severity finding remains.
+
+Observed verification:
+
+| Command or check | Result |
+|---|---|
+| Focused TDD suites | Passed after observing expected pre-implementation failures: progress snapshot/route/UI, Practice navigation, BFF allowlist, review-to-progress link, and whole-A1 dashboard coverage |
+| `npm test` | Passed: 43 files, 158 tests across shared, API, web, and architecture suites; includes the post-review saved-vocabulary-only progress case |
+| `npm run test:integration` | Passed: 7 files, 26 tests against the guarded Atlas `_test` database, including progress ownership isolation |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and Next.js routes including `/progress` compiled |
+| `npm run test:e2e` | Passed: 18 tests across desktop Chromium and mobile Chromium, including 375px progress layout and zero serious/critical axe violations |
+| `npm audit --audit-level=high` | Passed with 0 vulnerabilities |
+| Live API smoke | Passed on an isolated temporary API port: health, dashboard, and progress returned HTTP 200 with a four-lesson A1 aggregate |
+| Live BFF smoke | Passed: `/api/health`, `/api/domain/dashboard`, and `/api/domain/progress` returned HTTP 200 through an authenticated session |
+| Secret/generated-file review | `.env.local` remains ignored and untracked; no generated cache, API bundle, Playwright artifact, or credential is included in the intended change set |
+
+The first Playwright run passed all 18 browser cases but Windows denied its sandboxed cleanup command; the approved follow-up exited successfully. Phase 07 remains in progress until the learner completes the deferred manual primary-loop review and any separately authorized preview decision is made.

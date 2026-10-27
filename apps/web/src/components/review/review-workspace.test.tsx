@@ -94,6 +94,10 @@ describe("ReviewWorkspace", () => {
     expect(
       await screen.findByRole("heading", { name: "Phiên ôn đã hoàn thành" }),
     ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Xem tiến độ" })).toHaveAttribute(
+      "href",
+      "/progress",
+    );
     expect(fetcher).toHaveBeenLastCalledWith(
       "/api/domain/review-sessions/000000000000000000000020/rate",
       expect.objectContaining({ method: "POST" }),

@@ -24,6 +24,7 @@ const lessonProgressSchema = new Schema(
 );
 
 lessonProgressSchema.index({ userId: 1, lessonId: 1 }, { unique: true });
+lessonProgressSchema.index({ userId: 1, updatedAt: -1 });
 
 export type LessonProgress = InferSchemaType<typeof lessonProgressSchema>;
 

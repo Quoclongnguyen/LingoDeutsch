@@ -12,7 +12,7 @@ This file owns the planned phase sequence. Detailed scope and verification for e
 | 04 | Today and A1 learning path | Complete | Data-backed dashboard, minimal A1 path, sample lesson, and save-word flow |
 | 05 | Grammar library | Complete | Structured A1 grammar topics, lesson links, and replay of completed lessons without losing progress |
 | 06 | Exercise engine | Complete | Server-graded multiple choice, fill-in-the-blank, word ordering, results, retry, and bounded attempt history |
-| 07 | Integration, QA, and preview | Not started | End-to-end learning loop, aggregate A1 progress, responsive/accessibility/security hardening, and separately authorized preview deployment |
+| 07 | Integration, QA, and preview | In progress | End-to-end learning loop, aggregate A1 progress, responsive/accessibility/security hardening, and separately authorized preview deployment |
 
 ## Phase gates
 
@@ -23,4 +23,4 @@ This file owns the planned phase sequence. Detailed scope and verification for e
 
 ## Current phase
 
-Phase 06 is complete. Phase 07, integration, QA, and preview preparation, is the next planned phase and has not started. Deployment still requires separate user authorization.
+Phase 07 is in progress. Progress aggregation, integrated navigation, QA, and preview preparation are being verified. Deployment still requires separate user authorization.
