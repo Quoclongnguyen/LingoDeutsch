@@ -1,8 +1,9 @@
 "use client";
 
 import { FileUp, X } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
+import { useModalDialog } from "@/components/dialog/use-modal-dialog";
 import { readDomainJson } from "@/lib/api/read-domain-json";
 
 type ImportRow = {
@@ -24,6 +25,11 @@ export function ImportDialog({
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { dialogRef, onKeyDown } = useModalDialog({
+    initialFocusRef: inputRef,
+    onClose,
+  });
 
   async function preview(event: FormEvent) {
     event.preventDefault();
@@ -90,6 +96,9 @@ export function ImportDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="import-dialog-title"
+        onKeyDown={onKeyDown}
+        ref={dialogRef}
+        tabIndex={-1}
       >
         <header className="dialog-heading">
           <div>
@@ -125,6 +134,7 @@ export function ImportDialog({
           <label className="field">
             Dữ liệu từ vựng
             <textarea
+              ref={inputRef}
               value={content}
               onChange={(event) => setContent(event.target.value)}
               required
