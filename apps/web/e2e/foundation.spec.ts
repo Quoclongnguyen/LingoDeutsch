@@ -44,6 +44,49 @@ test("sign-in foundation is usable on desktop and mobile", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("unknown routes provide an accessible recovery path", async ({
+  page,
+}, testInfo) => {
+  const response = await page.goto("/missing-study-page");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { name: "Không tìm thấy trang" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Về Hôm nay", exact: true }),
+  ).toHaveAttribute("href", "/today");
+  await expect(page.getByRole("link", { name: "Đăng nhập" })).toHaveAttribute(
+    "href",
+    "/auth/signin",
+  );
+
+  const hasHorizontalOverflow = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth >
+      document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+
+  await page.getByRole("button", { name: "Dùng giao diện sáng" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: true,
+    path: `test-results/not-found-light-${testInfo.project.name}.png`,
+  });
+
+  await page.getByRole("button", { name: "Dùng giao diện tối" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.screenshot({
+    animations: "disabled",
+    fullPage: true,
+    path: `test-results/not-found-dark-${testInfo.project.name}.png`,
+  });
+});
+
 test("authenticated learner sees the responsive application shell", async ({
   page,
 }, testInfo) => {
