@@ -454,3 +454,33 @@ Observed verification:
 | Secret/dependency review | No dependency, API, database, environment variable, credential, or deployment change |
 
 Phase 07 remains in progress pending the learner's deferred manual primary-loop review. Preview deployment remains separately authorized and was not performed.
+
+### 2026-10-27 — Phase 07 recoverable not-found state
+
+Implemented:
+
+- Replaced the framework-default unmatched-route screen with a product-specific Vietnamese 404 state that returns a real HTTP 404 response.
+- Added direct recovery paths to Today and sign-in, retained the light/dark theme control, and included one concise German phrase with Vietnamese support.
+- Built the layout from the existing Sea Glass semantic tokens with a single-column mobile composition and restrained asymmetric desktop composition.
+- Added component coverage for the missing-page explanation and both recovery links.
+- Added Playwright coverage for HTTP status, recovery links, page-level overflow, light/dark themes, desktop/mobile screenshots, and axe accessibility.
+- The first mobile axe run exposed a serious unnamed brand-link issue caused by responsive hidden text. A first `aria-label` fix then exposed WCAG 2.5.3 label/content mismatch. The final implementation keeps the visible brand copy in the accessibility tree with a visually-hidden mobile treatment; focused desktop/mobile checks and the full browser suite are green.
+- Reviewed all four final screenshots. Typography, hierarchy, actions, contrast, and responsive stacking remain legible in both themes with no product-level overlap or horizontal scroll.
+- Mutation-checked the primary recovery target: changing `/today` to `/learn` made the component regression fail, and restoring `/today` returned the focused test to green.
+
+Observed verification:
+
+| Command or check | Result |
+|---|---|
+| Focused TDD suite | Expected RED because `not-found.tsx` did not exist; GREEN after implementation: 1 file, 1 test |
+| Focused Playwright 404 check | Passed: 2/2 desktop and mobile Chromium cases with zero axe violations |
+| Mutation check | Expected failure when the primary recovery target was changed; restored focused test passed 1/1 |
+| `npm test` | Passed: 45 files, 172 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed |
+| `npm run build` | Passed; the custom `/_not-found` output and all existing application routes compiled |
+| `npm run test:e2e` | Passed: 20 tests across desktop Chromium and mobile Chromium |
+| Secret/dependency review | No dependency, API, database, environment variable, credential, or deployment change |
+
+Phase 07 remains in progress pending the learner's deferred manual primary-loop review. Preview deployment remains separately authorized and was not performed.
