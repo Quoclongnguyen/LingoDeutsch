@@ -11,14 +11,7 @@ import {
   ReviewRecovery,
 } from "@/components/review/review-states";
 import type { ReviewRating, ReviewSession } from "@/components/review/types";
-
-async function readJson<T>(response: Response): Promise<T> {
-  const data = (await response.json()) as T & { message?: string };
-  if (!response.ok) {
-    throw new Error(data.message ?? "Máy chủ chưa thể xử lý lượt ôn.");
-  }
-  return data;
-}
+import { readDomainJson } from "@/lib/api/read-domain-json";
 
 export function ReviewWorkspace() {
   const [session, setSession] = useState<ReviewSession>();
@@ -36,12 +29,13 @@ export function ReviewWorkspace() {
     setLoading(true);
     setError("");
     try {
-      const result = await readJson<ReviewSession>(
+      const result = await readDomainJson<ReviewSession>(
         await fetch("/api/domain/review-sessions", {
           body: JSON.stringify({ mode: "de-vi", restart }),
           headers: { "content-type": "application/json" },
           method: "POST",
         }),
+        "Máy chủ chưa thể xử lý lượt ôn.",
       );
       setSession(result);
       setRecoveryChoice(result.resumed && !restart);
@@ -74,7 +68,7 @@ export function ReviewWorkspace() {
       setRating(nextRating);
       setError("");
       try {
-        const result = await readJson<{ session: ReviewSession }>(
+        const result = await readDomainJson<{ session: ReviewSession }>(
           await fetch(`/api/domain/review-sessions/${session.id}/rate`, {
             body: JSON.stringify({
               rating: nextRating,
@@ -84,6 +78,7 @@ export function ReviewWorkspace() {
             headers: { "content-type": "application/json" },
             method: "POST",
           }),
+          "Chưa lưu được lượt ôn.",
         );
         pendingEvent.current = undefined;
         setSession(result.session);

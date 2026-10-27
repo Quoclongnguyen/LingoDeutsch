@@ -14,7 +14,7 @@ import type {
   ExerciseSourceType,
   PublicExercise,
 } from "@lingo-deutsch/shared";
-import { readDomainJson } from "@/components/learning/read-domain-json";
+import { readDomainJson } from "@/lib/api/read-domain-json";
 
 type AttemptResult = {
   attempt: {

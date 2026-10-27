@@ -119,4 +119,24 @@ describe("VocabularyWorkspace", () => {
     expect(within(dialog).getByLabelText("Nghĩa tiếng Việt")).toBeRequired();
     expect(within(dialog).getByLabelText("Loại từ")).toBeInTheDocument();
   });
+
+  it("shows a stable error when the vocabulary response has no JSON body", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string | URL | Request) =>
+        String(input).includes("vocabulary-sets")
+          ? Response.json({ items: [] })
+          : new Response(null, { status: 503 }),
+      ),
+    );
+
+    render(<VocabularyWorkspace />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Máy chủ chưa thể xử lý yêu cầu.",
+    );
+    expect(
+      screen.queryByText(/Unexpected end of JSON input/i),
+    ).not.toBeInTheDocument();
+  });
 });

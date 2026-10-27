@@ -24,4 +24,12 @@ describe("readDomainJson", () => {
       "Không thể tải dữ liệu học tập.",
     );
   });
+
+  it("uses a caller-specific fallback for an empty failure", async () => {
+    const response = new Response(null, { status: 503 });
+
+    await expect(
+      readDomainJson(response, "Không thể tải kho từ."),
+    ).rejects.toThrow("Không thể tải kho từ.");
+  });
 });

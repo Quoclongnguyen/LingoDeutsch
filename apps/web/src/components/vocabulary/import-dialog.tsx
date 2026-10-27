@@ -3,6 +3,8 @@
 import { FileUp, X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
+import { readDomainJson } from "@/lib/api/read-domain-json";
+
 type ImportRow = {
   errors: string[];
   input?: Record<string, unknown>;
@@ -28,17 +30,17 @@ export function ImportDialog({
     setPending(true);
     setError("");
     try {
-      const response = await fetch("/api/domain/vocabulary/import/preview", {
-        body: JSON.stringify({ content, format }),
-        headers: { "content-type": "application/json" },
-        method: "POST",
-      });
-      const data = (await response.json()) as {
+      const data = await readDomainJson<{
         rows?: ImportRow[];
         message?: string;
-      };
-      if (!response.ok)
-        throw new Error(data.message ?? "Không thể xem trước dữ liệu nhập.");
+      }>(
+        await fetch("/api/domain/vocabulary/import/preview", {
+          body: JSON.stringify({ content, format }),
+          headers: { "content-type": "application/json" },
+          method: "POST",
+        }),
+        "Không thể xem trước dữ liệu nhập.",
+      );
       setRows(data.rows ?? []);
     } catch (caught) {
       setError(
@@ -59,15 +61,14 @@ export function ImportDialog({
     setPending(true);
     setError("");
     try {
-      const response = await fetch("/api/domain/vocabulary/import/commit", {
-        body: JSON.stringify({ items }),
-        headers: { "content-type": "application/json" },
-        method: "POST",
-      });
-      if (!response.ok) {
-        const data = (await response.json()) as { message?: string };
-        throw new Error(data.message ?? "Không thể nhập từ.");
-      }
+      await readDomainJson(
+        await fetch("/api/domain/vocabulary/import/commit", {
+          body: JSON.stringify({ items }),
+          headers: { "content-type": "application/json" },
+          method: "POST",
+        }),
+        "Không thể nhập từ.",
+      );
       await onImported();
       onClose();
     } catch (caught) {

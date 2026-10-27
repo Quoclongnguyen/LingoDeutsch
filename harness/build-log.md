@@ -14,7 +14,7 @@ This file records observed implementation progress and verification evidence. Pl
 | 04 — Today and A1 learning path | Complete | Data-backed dashboard and A1 path, progress/prerequisite enforcement, lesson player, save-word flow, and verified responsive UI |
 | 05 — Grammar library | Complete | Five structured A1 topics, grammar/lesson links, safe replay, Atlas seed, and all finish gates verified |
 | 06 — Exercise engine | Complete | Three server-graded exercise types, private answer keys, idempotent user-owned attempts, populated lessons, accessible practice UI, and all finish gates verified |
-| 07 — Integration, QA, and preview | Not started | — |
+| 07 — Integration, QA, and preview | In progress | Whole-A1 progress, integrated navigation, recoverable domain reads, accessibility/mobile E2E, and preview checklist verified; learner manual QA remains deferred |
 
 ## Activity
 
@@ -402,3 +402,27 @@ Observed verification:
 | `npm run test:e2e:run` | Passed: 18 tests across desktop Chromium and mobile Chromium against the active isolated test server |
 
 Phase 07 remains in progress pending the learner's deferred manual primary-loop review and any separately authorized preview decision.
+
+### 2026-10-27 — Phase 07 resilient domain response parsing
+
+Implemented:
+
+- Moved the browser domain-response parser from the Learning feature into the shared web API boundary so all feature workspaces use the same safe response handling.
+- Added caller-specific fallback messages for empty or non-JSON failure responses while preserving structured API messages when present.
+- Replaced direct `response.json()` parsing in Vocabulary, bulk import, and SRS review flows. These screens now show stable Vietnamese errors instead of leaking parser text such as `Unexpected end of JSON input`.
+- Added regression coverage for empty failures in vocabulary loading, import preview, and review-session startup.
+
+Observed verification:
+
+| Command or check | Result |
+|---|---|
+| Focused TDD suite | Four new regression assertions failed before implementation, then passed: 4 files, 12 tests |
+| `npm test` | Passed: 44 files, 169 tests across shared, API, web, and architecture suites |
+| `npm run typecheck` | Passed for shared, API, and web workspaces |
+| `npm run lint` | Passed with no ESLint errors or warnings |
+| `npm run format:check` | Passed after formatting the three changed test files |
+| `npm run build` | Passed; shared contracts, Fastify bundle, and all Next.js routes compiled |
+| `npm run test:e2e` | Passed: 18 desktop/mobile Chromium tests after identifying and stopping a stale test-only Next server on port 3100 |
+| Secret/dependency review | No dependency, environment variable, credential, database, or deployment change |
+
+Phase 07 remains in progress pending the learner's deferred manual primary-loop review. Preview deployment remains separately authorized and was not performed.
