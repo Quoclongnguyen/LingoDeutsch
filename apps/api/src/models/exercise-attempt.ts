@@ -21,6 +21,7 @@ const exerciseAttemptSchema = new Schema(
 );
 
 exerciseAttemptSchema.index({ attemptEventId: 1 }, { unique: true });
+exerciseAttemptSchema.index({ userId: 1, completedAt: -1 });
 exerciseAttemptSchema.index({
   userId: 1,
   sourceType: 1,

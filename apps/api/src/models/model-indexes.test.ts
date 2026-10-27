@@ -75,6 +75,12 @@ describe("Phase 01 model indexes", () => {
       ),
     ).toBe(true);
     expect(
+      hasIndex(LessonProgressModel.schema.indexes(), {
+        userId: 1,
+        updatedAt: -1,
+      }),
+    ).toBe(true);
+    expect(
       hasIndex(
         LessonProgressModel.schema.indexes(),
         { userId: 1, lessonId: 1 },
@@ -104,5 +110,6 @@ describe("Phase 01 model indexes", () => {
         completedAt: -1,
       }),
     ).toBe(true);
+    expect(hasIndex(indexes, { userId: 1, completedAt: -1 })).toBe(true);
   });
 });

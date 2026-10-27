@@ -1,6 +1,6 @@
 # Phase 07 — Integration, QA, and preview
 
-**Status:** Not started
+**Status:** In progress
 
 ## Outcome
 

@@ -10,6 +10,7 @@ const allowedRoots = new Set([
   "learning-path",
   "lesson-progress",
   "lessons",
+  "progress",
   "review-sessions",
   "reviews",
   "vocabulary",

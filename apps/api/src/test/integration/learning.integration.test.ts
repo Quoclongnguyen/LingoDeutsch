@@ -141,6 +141,11 @@ describe("learning vertical slice", () => {
     const dashboard = await getDashboard({ now, userId });
     expect(dashboard.due.count).toBe(1);
     expect(dashboard.due.words[0]?.headword).toBe("Name");
+    expect(dashboard.milestone).toMatchObject({
+      completedLessons: 0,
+      titleDe: "A1",
+      totalLessons: 4,
+    });
   });
 
   it("links an existing word without replacing its original lesson source", async () => {

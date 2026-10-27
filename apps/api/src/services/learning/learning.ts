@@ -36,6 +36,7 @@ import {
 } from "@/repositories/vocabulary-word-repository";
 import { buildLearningPath } from "./learning-path";
 import { listGrammarTopicsForLesson } from "@/services/grammar/grammar";
+import { summarizeLearningPath } from "@/services/progress/progress-snapshot";
 
 export class LessonNotFoundError extends Error {
   constructor() {
@@ -347,6 +348,7 @@ export async function getDashboard({
     .sort((left, right) => right.at.getTime() - left.at.getTime())
     .slice(0, 5)
     .map((activity) => ({ ...activity, at: activity.at.toISOString() }));
+  const a1Progress = summarizeLearningPath(path);
 
   return {
     due: {
@@ -359,14 +361,15 @@ export async function getDashboard({
         plural: candidate.word.plural,
       })),
     },
-    milestone: path.modules[0]
-      ? {
-          completedLessons: path.modules[0].completedLessons,
-          titleDe: path.modules[0].titleDe,
-          titleVi: path.modules[0].titleVi,
-          totalLessons: path.modules[0].totalLessons,
-        }
-      : undefined,
+    milestone:
+      a1Progress.totalLessons > 0
+        ? {
+            completedLessons: a1Progress.completedLessons,
+            titleDe: "A1",
+            titleVi: "Lộ trình A1",
+            totalLessons: a1Progress.totalLessons,
+          }
+        : undefined,
     nextLesson: path.nextLesson,
     practicalGoal: {
       de: "Sich höflich vorstellen und einen Termin vereinbaren",

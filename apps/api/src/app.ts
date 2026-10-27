@@ -50,6 +50,11 @@ import {
   ExerciseSourceNotFoundError,
   InvalidExerciseAnswersError,
 } from "@/services/exercise/exercise-attempts";
+import {
+  defaultProgressServices,
+  registerProgressRoutes,
+  type ProgressRouteServices,
+} from "@/routes/progress";
 
 export async function buildApi({
   logger = true,
@@ -57,6 +62,7 @@ export async function buildApi({
   exerciseAttemptServices,
   grammarServices,
   learningServices,
+  progressServices,
   reviewServices,
   vocabularyServices,
   webOrigin,
@@ -65,6 +71,7 @@ export async function buildApi({
   exerciseAttemptServices?: Partial<ExerciseAttemptRouteServices>;
   grammarServices?: Partial<GrammarRouteServices>;
   learningServices?: Partial<LearningRouteServices>;
+  progressServices?: Partial<ProgressRouteServices>;
   logger?: FastifyServerOptions["logger"];
   reviewServices?: Partial<ReviewRouteServices>;
   vocabularyServices?: Partial<VocabularyRouteServices>;
@@ -165,6 +172,10 @@ export async function buildApi({
       ...defaultExerciseAttemptServices,
       ...exerciseAttemptServices,
     },
+  });
+  await registerProgressRoutes(api, {
+    internalApiSecret,
+    services: { ...defaultProgressServices, ...progressServices },
   });
 
   return api;
