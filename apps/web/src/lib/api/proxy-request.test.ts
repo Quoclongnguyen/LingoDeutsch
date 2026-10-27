@@ -125,4 +125,25 @@ describe("proxyDomainRequest", () => {
 
     expect(response.status).toBe(204);
   });
+
+  it("returns a structured 503 response when the domain API is unavailable", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockRejectedValue(new TypeError("fetch failed"));
+
+    const response = await proxyDomainRequest({
+      baseUrl: "http://127.0.0.1:4000/api/v1",
+      fetcher,
+      internalApiSecret: "trusted-secret",
+      path: ["dashboard"],
+      request: new Request("http://localhost/api/domain/dashboard"),
+      userId: "000000000000000000000001",
+    });
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({
+      error: "domain_api_unavailable",
+      message: "Dịch vụ học tập đang tạm thời không phản hồi.",
+    });
+  });
 });

@@ -57,12 +57,23 @@ export async function proxyDomainRequest({
   };
   if (body) headers["content-type"] = "application/json";
 
-  const upstream = await fetcher(upstreamUrl.toString(), {
-    body: body || undefined,
-    cache: "no-store",
-    headers,
-    method: request.method,
-  });
+  let upstream: Response;
+  try {
+    upstream = await fetcher(upstreamUrl.toString(), {
+      body: body || undefined,
+      cache: "no-store",
+      headers,
+      method: request.method,
+    });
+  } catch {
+    return Response.json(
+      {
+        error: "domain_api_unavailable",
+        message: "Dịch vụ học tập đang tạm thời không phản hồi.",
+      },
+      { status: 503 },
+    );
+  }
 
   return new Response(upstream.body, {
     headers: {
