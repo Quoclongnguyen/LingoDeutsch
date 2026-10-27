@@ -2,47 +2,36 @@
 
 import { ArrowRight, BookOpenText, Link2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import type { GrammarTopicListResponse } from "@lingo-deutsch/shared";
 import { LearnSectionNavigation } from "@/components/learning/learn-section-navigation";
-import { readDomainJson } from "@/components/learning/read-domain-json";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
+import { RetryableErrorState } from "@/components/states/retryable-error-state";
+import { useDomainResource } from "@/components/states/use-domain-resource";
 
 export function GrammarLibraryWorkspace() {
-  const [response, setResponse] = useState<GrammarTopicListResponse>();
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    void fetch("/api/domain/grammar-topics?level=A1", { cache: "no-store" })
-      .then(readDomainJson<GrammarTopicListResponse>)
-      .then((result) => active && setResponse(result))
-      .catch(
-        (caught: unknown) =>
-          active &&
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Không thể tải thư viện ngữ pháp.",
-          ),
-      );
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    data: response,
+    error,
+    loading,
+    retry,
+  } = useDomainResource<GrammarTopicListResponse>(
+    "/api/domain/grammar-topics?level=A1",
+    "Không thể tải thư viện ngữ pháp.",
+  );
 
   if (error) {
     return (
-      <EmptyState
+      <RetryableErrorState
         icon={BookOpenText}
         title="Chưa thể tải ngữ pháp A1"
-        description={`${error} Hãy tải lại trang để thử lại.`}
+        description={`${error} Bạn có thể thử kết nối lại ngay.`}
+        onRetry={retry}
       />
     );
   }
-  if (!response) return <LoadingSkeleton />;
+  if (loading || !response) return <LoadingSkeleton />;
 
   return (
     <div className="page-stack grammar-library-page">

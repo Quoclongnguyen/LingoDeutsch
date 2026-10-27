@@ -2,46 +2,35 @@
 
 import { ArrowRight, Check, Clock3, LockKeyhole, Target } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
-import { readDomainJson } from "./read-domain-json";
+import { RetryableErrorState } from "@/components/states/retryable-error-state";
+import { useDomainResource } from "@/components/states/use-domain-resource";
 import type { LearningPathResponse } from "./types";
 import { LearnSectionNavigation } from "./learn-section-navigation";
 
 export function LearningPathWorkspace() {
-  const [path, setPath] = useState<LearningPathResponse>();
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    void fetch("/api/domain/learning-path?level=A1", { cache: "no-store" })
-      .then(readDomainJson<LearningPathResponse>)
-      .then((result) => active && setPath(result))
-      .catch(
-        (caught: unknown) =>
-          active &&
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : "Không thể tải lộ trình.",
-          ),
-      );
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    data: path,
+    error,
+    loading,
+    retry,
+  } = useDomainResource<LearningPathResponse>(
+    "/api/domain/learning-path?level=A1",
+    "Không thể tải lộ trình.",
+  );
 
   if (error) {
     return (
-      <EmptyState
+      <RetryableErrorState
         title="Chưa thể tải lộ trình A1"
-        description={`${error} Hãy tải lại trang để thử lại.`}
+        description={`${error} Bạn có thể thử kết nối lại ngay.`}
+        onRetry={retry}
       />
     );
   }
-  if (!path) return <LoadingSkeleton />;
+  if (loading || !path) return <LoadingSkeleton />;
   if (path.modules.length === 0) {
     return (
       <EmptyState

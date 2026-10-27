@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GrammarLibraryWorkspace } from "./grammar-library-workspace";
@@ -122,5 +123,67 @@ describe("Phase 05 grammar workspaces", () => {
       "href",
       "/practice/exercises/grammar_topic/a1-sein-und-haben",
     );
+  });
+
+  it("retries the grammar library request without reloading the page", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { message: "Dịch vụ đang tạm thời gián đoạn." },
+          { status: 503 },
+        ),
+      )
+      .mockResolvedValueOnce(Response.json({ level: "A1", topics: [] }));
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<GrammarLibraryWorkspace />);
+
+    const retry = await screen.findByRole("button", { name: "Thử lại" });
+    await user.click(retry);
+
+    expect(
+      await screen.findByRole("heading", { name: "Ngữ pháp tiếng Đức A1" }),
+    ).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries a grammar topic request without reloading the page", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { message: "Dịch vụ đang tạm thời gián đoạn." },
+          { status: 503 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          examples: [],
+          exercises: [],
+          id: "topic-1",
+          level: "A1",
+          order: 3,
+          relatedLessons: [],
+          rules: [],
+          slug: "a1-sein-und-haben",
+          summaryVi: "Hai động từ cơ bản.",
+          titleDe: "sein und haben",
+          titleVi: "Động từ sein và haben",
+        }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<GrammarTopicWorkspace slug="a1-sein-und-haben" />);
+
+    const retry = await screen.findByRole("button", { name: "Thử lại" });
+    await user.click(retry);
+
+    expect(
+      await screen.findByRole("heading", { name: "sein und haben" }),
+    ).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(2);
   });
 });

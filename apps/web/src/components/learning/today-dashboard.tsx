@@ -2,44 +2,34 @@
 
 import { ArrowRight, BookOpen, MapPin } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
-import { readDomainJson } from "./read-domain-json";
+import { RetryableErrorState } from "@/components/states/retryable-error-state";
+import { useDomainResource } from "@/components/states/use-domain-resource";
 import { RecentLearning, TodayRail } from "./today-supporting-panels";
 import type { DashboardResponse } from "./types";
 
 export function TodayDashboard() {
-  const [dashboard, setDashboard] = useState<DashboardResponse>();
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    void fetch("/api/domain/dashboard", { cache: "no-store" })
-      .then(readDomainJson<DashboardResponse>)
-      .then((result) => active && setDashboard(result))
-      .catch(
-        (caught: unknown) =>
-          active &&
-          setError(
-            caught instanceof Error ? caught.message : "Không thể tải Hôm nay.",
-          ),
-      );
-    return () => {
-      active = false;
-    };
-  }, []);
+  const {
+    data: dashboard,
+    error,
+    loading,
+    retry,
+  } = useDomainResource<DashboardResponse>(
+    "/api/domain/dashboard",
+    "Không thể tải Hôm nay.",
+  );
 
   if (error) {
     return (
-      <EmptyState
+      <RetryableErrorState
         title="Chưa thể chuẩn bị buổi học hôm nay"
-        description={`${error} Hãy tải lại trang để thử lại.`}
+        description={`${error} Bạn có thể thử kết nối lại ngay.`}
+        onRetry={retry}
       />
     );
   }
-  if (!dashboard) return <LoadingSkeleton />;
+  if (loading || !dashboard) return <LoadingSkeleton />;
 
   return (
     <div className="page-stack today-page">

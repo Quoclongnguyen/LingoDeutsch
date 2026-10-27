@@ -288,4 +288,145 @@ describe("Phase 04 learning workspaces", () => {
     );
     expect(screen.getByText("der Termin")).toBeInTheDocument();
   });
+
+  it("retries the Today request without reloading the page", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { message: "Dịch vụ đang tạm thời gián đoạn." },
+          { status: 503 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          due: { count: 0, words: [] },
+          nextLesson: {
+            estimatedMinutes: 15,
+            objectiveVi: lessonRecord.objectiveVi,
+            slug: lessonRecord.slug,
+            titleDe: lessonRecord.titleDe,
+            titleVi: lessonRecord.titleVi,
+          },
+          practicalGoal: {
+            de: "Einen Termin vereinbaren",
+            vi: "Đặt một cuộc hẹn bằng tiếng Đức.",
+          },
+          recentActivity: [],
+          weeklyGoal: { completed: 0, target: 5 },
+        }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<TodayDashboard />);
+
+    const retry = await screen.findByRole("button", { name: "Thử lại" });
+    await user.click(retry);
+
+    expect(
+      await screen.findByRole("heading", { name: lessonRecord.titleDe }),
+    ).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries the A1 learning path request without reloading the page", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { message: "Dịch vụ đang tạm thời gián đoạn." },
+          { status: 503 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          level: "A1",
+          modules: [
+            {
+              completedLessons: 0,
+              descriptionVi: "Ngôn ngữ nền tảng.",
+              dueCount: 0,
+              estimatedMinutes: 15,
+              lessons: [
+                {
+                  ...lessonRecord,
+                  isLocked: false,
+                  isNext: true,
+                  lessonOrder: 1,
+                  moduleOrder: 1,
+                  vocabularyCount: 10,
+                },
+              ],
+              moduleOrder: 1,
+              outcomeVi: "Tự giới thiệu lịch sự.",
+              progressPercent: 0,
+              titleDe: "Ankommen und vorstellen",
+              titleVi: "Làm quen và giới thiệu",
+              totalLessons: 1,
+              vocabularyCount: 10,
+            },
+          ],
+          nextLesson: { slug: lessonRecord.slug },
+        }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<LearningPathWorkspace />);
+
+    const retry = await screen.findByRole("button", { name: "Thử lại" });
+    await user.click(retry);
+
+    expect(
+      await screen.findByRole("heading", { name: "Ankommen und vorstellen" }),
+    ).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries the lesson request without reloading the page", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json(
+          { message: "Dịch vụ đang tạm thời gián đoạn." },
+          { status: 503 },
+        ),
+      )
+      .mockResolvedValueOnce(Response.json(lessonRecord));
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<LessonWorkspace slug={lessonRecord.slug} />);
+
+    const retry = await screen.findByRole("button", { name: "Thử lại" });
+    await user.click(retry);
+
+    expect(await screen.findByText("der Name · die Namen")).toBeInTheDocument();
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps the lesson visible when saving a word fails", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(Response.json(lessonRecord))
+      .mockResolvedValueOnce(
+        Response.json({ message: "Chưa thể lưu từ." }, { status: 503 }),
+      );
+    vi.stubGlobal("fetch", fetcher);
+    const user = userEvent.setup();
+
+    render(<LessonWorkspace slug={lessonRecord.slug} />);
+    await user.click(
+      await screen.findByRole("button", { name: "Lưu vào kho từ" }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Chưa thể lưu từ.",
+    );
+    expect(
+      screen.getByRole("heading", { name: lessonRecord.titleDe }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Chưa thể mở bài học")).not.toBeInTheDocument();
+  });
 });

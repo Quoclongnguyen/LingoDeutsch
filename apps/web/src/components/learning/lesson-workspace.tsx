@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Clock3 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { LessonActivityView } from "./lesson-activity";
 import { LessonComplete } from "./lesson-complete";
@@ -10,6 +10,8 @@ import { readDomainJson } from "./read-domain-json";
 import type { LessonResponse } from "./types";
 import { EmptyState } from "@/components/states/empty-state";
 import { LoadingSkeleton } from "@/components/states/loading-skeleton";
+import { RetryableErrorState } from "@/components/states/retryable-error-state";
+import { useDomainResource } from "@/components/states/use-domain-resource";
 
 function activityActionLabel({
   isLast,
@@ -32,39 +34,30 @@ export function LessonWorkspace({
   replay?: boolean;
   slug: string;
 }) {
-  const [lesson, setLesson] = useState<LessonResponse>();
-  const [error, setError] = useState("");
+  const {
+    data: lesson,
+    error: loadError,
+    loading,
+    retry,
+    updateData: setLesson,
+  } = useDomainResource<LessonResponse>(
+    `/api/domain/lessons/${encodeURIComponent(slug)}`,
+    "Không thể tải bài học.",
+  );
+  const [actionError, setActionError] = useState("");
   const [pending, setPending] = useState(false);
   const [savingHeadword, setSavingHeadword] = useState("");
   const [exerciseComplete, setExerciseComplete] = useState(false);
   const [replayIndex, setReplayIndex] = useState(0);
   const [replayComplete, setReplayComplete] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    void fetch(`/api/domain/lessons/${encodeURIComponent(slug)}`, {
-      cache: "no-store",
-    })
-      .then(readDomainJson<LessonResponse>)
-      .then((result) => active && setLesson(result))
-      .catch(
-        (caught: unknown) =>
-          active &&
-          setError(
-            caught instanceof Error ? caught.message : "Không thể tải bài học.",
-          ),
-      );
-    return () => {
-      active = false;
-    };
-  }, [slug]);
-
-  if (error) {
+  if (loadError) {
     return (
-      <EmptyState
+      <RetryableErrorState
         title="Chưa thể mở bài học"
-        description={`${error} Hãy quay lại lộ trình và thử lại.`}
-        action={
+        description={`${loadError} Bạn có thể thử lại hoặc quay về lộ trình.`}
+        onRetry={retry}
+        secondaryAction={
           <Link className="button button--secondary" href="/learn">
             Quay lại lộ trình
           </Link>
@@ -72,7 +65,7 @@ export function LessonWorkspace({
       />
     );
   }
-  if (!lesson) return <LoadingSkeleton />;
+  if (loading || !lesson) return <LoadingSkeleton />;
 
   const activities = lesson.content.activities;
   const completed = replay
@@ -90,7 +83,7 @@ export function LessonWorkspace({
 
   async function saveWord(headword: string) {
     setSavingHeadword(headword);
-    setError("");
+    setActionError("");
     try {
       await readDomainJson(
         await fetch(`/api/domain/lessons/${lesson!.id}/vocabulary`, {
@@ -99,18 +92,16 @@ export function LessonWorkspace({
           method: "POST",
         }),
       );
-      setLesson((current) =>
-        current
-          ? {
-              ...current,
-              vocabulary: current.vocabulary.map((word) =>
-                word.headword === headword ? { ...word, isSaved: true } : word,
-              ),
-            }
-          : current,
-      );
+      setLesson((current) => ({
+        ...current,
+        vocabulary: current.vocabulary.map((word) =>
+          word.headword === headword ? { ...word, isSaved: true } : word,
+        ),
+      }));
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Không thể lưu từ.");
+      setActionError(
+        caught instanceof Error ? caught.message : "Không thể lưu từ.",
+      );
     } finally {
       setSavingHeadword("");
     }
@@ -128,7 +119,7 @@ export function LessonWorkspace({
       return;
     }
     setPending(true);
-    setError("");
+    setActionError("");
     const completedActivityIds = activities
       .slice(0, currentIndex + 1)
       .map((item) => item.id);
@@ -147,10 +138,13 @@ export function LessonWorkspace({
           method: "PATCH",
         }),
       );
-      setLesson((current) => (current ? { ...current, progress } : current));
+      setLesson((current) => ({
+        ...current,
+        progress,
+      }));
       setExerciseComplete(false);
     } catch (caught) {
-      setError(
+      setActionError(
         caught instanceof Error ? caught.message : "Không thể lưu tiến độ.",
       );
     } finally {
@@ -238,9 +232,9 @@ export function LessonWorkspace({
         />
       )}
 
-      {error ? (
+      {actionError ? (
         <p className="form-error" role="alert">
-          {error}
+          {actionError}
         </p>
       ) : null}
       {activity ? (
